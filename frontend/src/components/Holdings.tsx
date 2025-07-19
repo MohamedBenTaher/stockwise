@@ -1,0 +1,395 @@
+import React, { useState } from "react";
+import { Plus, Edit, Trash2, Loader2, AlertCircle } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "./ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
+import { Input } from "./ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Alert, AlertDescription } from "./ui/alert";
+
+import {
+  useHoldings,
+  useCreateHolding,
+  useUpdateHolding,
+  useDeleteHolding,
+} from "@/hooks";
+import { toast } from "sonner";
+
+const holdingSchema = z.object({
+  ticker: z.string().min(1, "Ticker is required").max(10, "Ticker too long"),
+  quantity: z.number().positive("Quantity must be positive"),
+  buy_price: z.number().positive("Price must be positive"),
+});
+
+type HoldingFormData = z.infer<typeof holdingSchema>;
+
+export const Holdings: React.FC = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingHolding, setEditingHolding] = useState<any>(null);
+
+  // React Query hooks
+  const { data: holdings = [], isLoading, error, refetch } = useHoldings();
+  const createHoldingMutation = useCreateHolding();
+  const updateHoldingMutation = useUpdateHolding();
+  const deleteHoldingMutation = useDeleteHolding();
+
+  const form = useForm<HoldingFormData>({
+    resolver: zodResolver(holdingSchema),
+    defaultValues: {
+      ticker: "",
+      quantity: 0,
+      buy_price: 0,
+    },
+  });
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
+  };
+
+  const formatPercentage = (percentage: number) => {
+    return `${percentage >= 0 ? "+" : ""}${percentage.toFixed(2)}%`;
+  };
+
+  const onSubmit = async (values: HoldingFormData) => {
+    try {
+      if (editingHolding) {
+        await updateHoldingMutation.mutateAsync({
+          id: editingHolding.id,
+          holding: values,
+        });
+        toast("Success: Holding updated successfully");
+      } else {
+        await createHoldingMutation.mutateAsync(values);
+        toast("Success: Holding created successfully");
+      }
+
+      setIsDialogOpen(false);
+      setEditingHolding(null);
+      form.reset();
+    } catch (error: any) {
+      toast(
+        "Error: " + (error?.response?.data?.detail || "Failed to save holding")
+      );
+    }
+  };
+
+  const handleEdit = (holding: any) => {
+    setEditingHolding(holding);
+    form.setValue("ticker", holding.ticker);
+    form.setValue("quantity", holding.quantity);
+    form.setValue("buy_price", holding.buy_price);
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = async (id: number, ticker: string) => {
+    if (window.confirm(`Are you sure you want to delete ${ticker}?`)) {
+      try {
+        await deleteHoldingMutation.mutateAsync(id);
+        toast(`Success: ${ticker} deleted successfully`);
+      } catch (error: any) {
+        toast(
+          "Error: " +
+            (error?.response?.data?.detail || "Failed to delete holding")
+        );
+      }
+    }
+  };
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+    setEditingHolding(null);
+    form.reset();
+  };
+
+  const isSubmitting =
+    createHoldingMutation.isPending || updateHoldingMutation.isPending;
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Holdings</h1>
+            <p className="text-gray-600">Manage your portfolio holdings</p>
+          </div>
+        </div>
+
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Failed to load holdings. Please try again.
+            <Button
+              variant="outline"
+              size="sm"
+              className="ml-2"
+              onClick={() => refetch()}
+            >
+              Retry
+            </Button>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Holdings</h1>
+          <p className="text-gray-600 mt-1">Manage your portfolio holdings</p>
+        </div>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Holding
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                {editingHolding ? "Edit Holding" : "Add New Holding"}
+              </DialogTitle>
+            </DialogHeader>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="ticker"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ticker Symbol</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g., AAPL"
+                          {...field}
+                          className="uppercase"
+                          onChange={(e) =>
+                            field.onChange(e.target.value.toUpperCase())
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="quantity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Quantity</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="e.g., 50"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(parseInt(e.target.value) || 0)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="buy_price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Buy Price</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="e.g., 150.00"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value) || 0)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-1"
+                  >
+                    {isSubmitting && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    {editingHolding ? "Update" : "Add"} Holding
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleDialogClose}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {/* Holdings Table */}
+      <Card className="shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Your Holdings</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+              <span className="ml-2 text-gray-600">Loading holdings...</span>
+            </div>
+          ) : holdings.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-gray-400 text-6xl mb-4">📊</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No holdings yet
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Start building your portfolio by adding your first holding.
+              </p>
+              <Button
+                onClick={() => setIsDialogOpen(true)}
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Your First Holding
+              </Button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="font-semibold">Ticker</TableHead>
+                    <TableHead className="font-semibold">Quantity</TableHead>
+                    <TableHead className="font-semibold">Buy Price</TableHead>
+                    <TableHead className="font-semibold">
+                      Current Price
+                    </TableHead>
+                    <TableHead className="font-semibold">Total Value</TableHead>
+                    <TableHead className="font-semibold">P/L</TableHead>
+                    <TableHead className="font-semibold">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {holdings.map((holding: any) => (
+                    <TableRow key={holding.id} className="hover:bg-gray-50">
+                      <TableCell className="font-medium text-blue-600">
+                        {holding.ticker}
+                      </TableCell>
+                      <TableCell>{holding.quantity.toLocaleString()}</TableCell>
+                      <TableCell>{formatCurrency(holding.buy_price)}</TableCell>
+                      <TableCell>
+                        {formatCurrency(
+                          holding.current_price || holding.buy_price
+                        )}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {formatCurrency(
+                          holding.total_value ||
+                            holding.buy_price * holding.quantity
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div
+                          className={`font-medium ${
+                            (holding.profit_loss || 0) >= 0
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {formatCurrency(holding.profit_loss || 0)}
+                        </div>
+                        <div
+                          className={`text-xs ${
+                            (holding.profit_loss_percentage || 0) >= 0
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {formatPercentage(
+                            holding.profit_loss_percentage || 0
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit(holding)}
+                            disabled={deleteHoldingMutation.isPending}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() =>
+                              handleDelete(holding.id, holding.ticker)
+                            }
+                            disabled={deleteHoldingMutation.isPending}
+                          >
+                            {deleteHoldingMutation.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
