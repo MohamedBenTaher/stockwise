@@ -19,32 +19,81 @@ class HoldingService:
 
     async def create_holding(
         self, user_id: int, holding_data: HoldingCreate
-    ) -> HoldingModel:
+    ) -> Holding:
         """Create a new holding."""
-        # Get current price
-        current_price = await self.price_service.get_current_price(holding_data.ticker)
+        try:
+            # Get current price
+            current_price = await self.price_service.get_current_price(
+                holding_data.ticker
+            )
 
-        db_holding = HoldingModel(
-            user_id=user_id,
-            ticker=holding_data.ticker.upper(),
-            asset_type=holding_data.asset_type,
-            quantity=holding_data.quantity,
-            buy_price=holding_data.buy_price,
-            current_price=current_price,
-            buy_date=holding_data.buy_date,
-        )
+            # Ensure current_price is not None or 0
+            if current_price is None or current_price <= 0:
+                current_price = holding_data.buy_price  # Fallback to buy price
 
-        # Get additional data (sector, country, etc.)
-        metadata = await self.price_service.get_asset_metadata(holding_data.ticker)
-        if metadata:
-            db_holding.sector = metadata.get("sector")
-            db_holding.country = metadata.get("country")
-            db_holding.market_cap = metadata.get("market_cap")
+            db_holding = HoldingModel(
+                user_id=user_id,
+                ticker=holding_data.ticker.upper(),
+                asset_type=holding_data.asset_type,
+                quantity=holding_data.quantity,
+                buy_price=holding_data.buy_price,
+                current_price=current_price,
+                buy_date=holding_data.buy_date,
+            )
 
-        self.db.add(db_holding)
-        await self.db.commit()
-        await self.db.refresh(db_holding)
-        return db_holding
+            # Get additional data (sector, country, etc.)
+            try:
+                metadata = await self.price_service.get_asset_metadata(
+                    holding_data.ticker
+                )
+                if metadata:
+                    db_holding.sector = metadata.get("sector")
+                    db_holding.country = metadata.get("country")
+                    db_holding.market_cap = metadata.get("market_cap")
+            except Exception as e:
+                print(
+                    f"Warning: Failed to get metadata for "
+                    f"{holding_data.ticker}: {e}"
+                )
+
+            self.db.add(db_holding)
+            await self.db.commit()
+            await self.db.refresh(db_holding)
+
+            # Calculate derived fields and return Holding schema
+            total_value = float(db_holding.quantity * current_price)
+            total_cost = float(db_holding.quantity * db_holding.buy_price)
+            profit_loss = total_value - total_cost
+            profit_loss_percentage = (
+                (profit_loss / total_cost) * 100 if total_cost > 0 else 0.0
+            )
+
+            # Create response with all required fields
+            return Holding(
+                id=db_holding.id,
+                user_id=db_holding.user_id,
+                ticker=db_holding.ticker,
+                asset_type=db_holding.asset_type,
+                quantity=float(db_holding.quantity),
+                buy_price=float(db_holding.buy_price),
+                current_price=float(current_price),
+                buy_date=db_holding.buy_date,
+                sector=db_holding.sector,
+                country=db_holding.country,
+                market_cap=(
+                    float(db_holding.market_cap) if db_holding.market_cap else None
+                ),
+                created_at=db_holding.created_at,
+                updated_at=db_holding.updated_at,
+                total_value=total_value,
+                total_cost=total_cost,
+                profit_loss=profit_loss,
+                profit_loss_percentage=profit_loss_percentage,
+            )
+        except Exception as e:
+            print(f"Error creating holding: {e}")
+            await self.db.rollback()
+            raise
 
     async def get_user_holdings(self, user_id: int) -> List[Holding]:
         """Get all holdings for a user with calculated fields."""
@@ -68,14 +117,27 @@ class HoldingService:
                 (profit_loss / total_cost) * 100 if total_cost > 0 else 0
             )
 
-            holding_dict = {
-                **holding.__dict__,
-                "total_value": total_value,
-                "total_cost": total_cost,
-                "profit_loss": profit_loss,
-                "profit_loss_percentage": profit_loss_percentage,
-            }
-            enriched_holdings.append(Holding(**holding_dict))
+            enriched_holdings.append(
+                Holding(
+                    id=holding.id,
+                    user_id=holding.user_id,
+                    ticker=holding.ticker,
+                    asset_type=holding.asset_type,
+                    quantity=holding.quantity,
+                    buy_price=holding.buy_price,
+                    current_price=current_price,
+                    buy_date=holding.buy_date,
+                    sector=holding.sector,
+                    country=holding.country,
+                    market_cap=holding.market_cap,
+                    created_at=holding.created_at,
+                    updated_at=holding.updated_at,
+                    total_value=total_value,
+                    total_cost=total_cost,
+                    profit_loss=profit_loss,
+                    profit_loss_percentage=profit_loss_percentage,
+                )
+            )
 
         return enriched_holdings
 
@@ -92,7 +154,7 @@ class HoldingService:
 
     async def update_holding(
         self, holding_id: int, holding_update: HoldingUpdate
-    ) -> HoldingModel:
+    ) -> Holding:
         """Update a holding."""
         result = await self.db.execute(
             select(HoldingModel).where(HoldingModel.id == holding_id)
@@ -103,9 +165,31 @@ class HoldingService:
         for field, value in update_data.items():
             setattr(holding, field, value)
 
+        # Update current price if ticker changed
+        if "ticker" in update_data:
+            current_price = await self.price_service.get_current_price(holding.ticker)
+            holding.current_price = current_price
+
         await self.db.commit()
         await self.db.refresh(holding)
-        return holding
+
+        # Calculate derived fields and return Holding schema
+        current_price = holding.current_price or holding.buy_price
+        total_value = holding.quantity * current_price
+        total_cost = holding.quantity * holding.buy_price
+        profit_loss = total_value - total_cost
+        profit_loss_percentage = (
+            (profit_loss / total_cost) * 100 if total_cost > 0 else 0
+        )
+
+        holding_dict = {
+            **holding.__dict__,
+            "total_value": total_value,
+            "total_cost": total_cost,
+            "profit_loss": profit_loss,
+            "profit_loss_percentage": profit_loss_percentage,
+        }
+        return Holding(**holding_dict)
 
     async def delete_holding(self, holding_id: int):
         """Delete a holding."""

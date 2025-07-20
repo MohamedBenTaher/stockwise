@@ -1,8 +1,18 @@
 import React, { useState } from "react";
-import { Plus, Edit, Trash2, Loader2, AlertCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Loader2,
+  AlertCircle,
+  CalendarIcon,
+} from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import {
   Table,
@@ -30,30 +40,28 @@ import {
 import { Input } from "./ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Alert, AlertDescription } from "./ui/alert";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Calendar } from "./ui/calendar";
 
-import {
-  useHoldings,
-  useCreateHolding,
-  useUpdateHolding,
-  useDeleteHolding,
-} from "@/hooks";
+import { useHoldings, useUpdateHolding, useDeleteHolding } from "@/hooks";
 import { toast } from "sonner";
 
 const holdingSchema = z.object({
   ticker: z.string().min(1, "Ticker is required").max(10, "Ticker too long"),
   quantity: z.number().positive("Quantity must be positive"),
   buy_price: z.number().positive("Price must be positive"),
+  buy_date: z.date(),
 });
 
 type HoldingFormData = z.infer<typeof holdingSchema>;
 
 export const Holdings: React.FC = () => {
+  const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingHolding, setEditingHolding] = useState<any>(null);
 
   // React Query hooks
   const { data: holdings = [], isLoading, error, refetch } = useHoldings();
-  const createHoldingMutation = useCreateHolding();
   const updateHoldingMutation = useUpdateHolding();
   const deleteHoldingMutation = useDeleteHolding();
 
@@ -63,6 +71,7 @@ export const Holdings: React.FC = () => {
       ticker: "",
       quantity: 0,
       buy_price: 0,
+      buy_date: new Date(),
     },
   });
 
@@ -82,17 +91,18 @@ export const Holdings: React.FC = () => {
       if (editingHolding) {
         await updateHoldingMutation.mutateAsync({
           id: editingHolding.id,
-          holding: values,
+          holding: {
+            ticker: values.ticker,
+            quantity: values.quantity,
+            buy_price: values.buy_price,
+            buy_date: values.buy_date.toISOString(),
+          },
         });
         toast("Success: Holding updated successfully");
-      } else {
-        await createHoldingMutation.mutateAsync(values);
-        toast("Success: Holding created successfully");
+        setIsDialogOpen(false);
+        setEditingHolding(null);
+        form.reset();
       }
-
-      setIsDialogOpen(false);
-      setEditingHolding(null);
-      form.reset();
     } catch (error: any) {
       toast(
         "Error: " + (error?.response?.data?.detail || "Failed to save holding")
@@ -105,6 +115,7 @@ export const Holdings: React.FC = () => {
     form.setValue("ticker", holding.ticker);
     form.setValue("quantity", holding.quantity);
     form.setValue("buy_price", holding.buy_price);
+    form.setValue("buy_date", new Date(holding.buy_date));
     setIsDialogOpen(true);
   };
 
@@ -125,11 +136,15 @@ export const Holdings: React.FC = () => {
   const handleDialogClose = () => {
     setIsDialogOpen(false);
     setEditingHolding(null);
-    form.reset();
+    form.reset({
+      ticker: "",
+      quantity: 0,
+      buy_price: 0,
+      buy_date: new Date(),
+    });
   };
 
-  const isSubmitting =
-    createHoldingMutation.isPending || updateHoldingMutation.isPending;
+  const isSubmitting = updateHoldingMutation.isPending;
 
   if (error) {
     return (
@@ -160,25 +175,28 @@ export const Holdings: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Holdings</h1>
-          <p className="text-gray-600 mt-1">Manage your portfolio holdings</p>
+    <>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Holdings</h1>
+            <p className="text-gray-600 mt-1">Manage your portfolio holdings</p>
+          </div>
+          <Button
+            onClick={() => navigate("/holdings/add")}
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Holding
+          </Button>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Holding
-            </Button>
-          </DialogTrigger>
+
+        {/* Edit Dialog */}
+        <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>
-                {editingHolding ? "Edit Holding" : "Add New Holding"}
-              </DialogTitle>
+              <DialogTitle>Edit Holding</DialogTitle>
             </DialogHeader>
             <Form {...form}>
               <form
@@ -246,16 +264,57 @@ export const Holdings: React.FC = () => {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="buy_date"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Purchase Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) =>
+                              date > new Date() || date < new Date("1900-01-01")
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <div className="flex gap-2 pt-4">
                   <Button
                     type="submit"
                     disabled={isSubmitting}
                     className="flex-1"
                   >
-                    {isSubmitting && (
+                    {editingHolding && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    {editingHolding ? "Update" : "Add"} Holding
+                    Update Holding
                   </Button>
                   <Button
                     type="button"
@@ -270,8 +329,6 @@ export const Holdings: React.FC = () => {
           </DialogContent>
         </Dialog>
       </div>
-
-      {/* Holdings Table */}
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Your Holdings</CardTitle>
@@ -292,7 +349,7 @@ export const Holdings: React.FC = () => {
                 Start building your portfolio by adding your first holding.
               </p>
               <Button
-                onClick={() => setIsDialogOpen(true)}
+                onClick={() => navigate("/holdings/add")}
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
               >
                 <Plus className="h-4 w-4 mr-2" />
@@ -307,6 +364,7 @@ export const Holdings: React.FC = () => {
                     <TableHead className="font-semibold">Ticker</TableHead>
                     <TableHead className="font-semibold">Quantity</TableHead>
                     <TableHead className="font-semibold">Buy Price</TableHead>
+                    <TableHead className="font-semibold">Buy Date</TableHead>
                     <TableHead className="font-semibold">
                       Current Price
                     </TableHead>
@@ -323,6 +381,11 @@ export const Holdings: React.FC = () => {
                       </TableCell>
                       <TableCell>{holding.quantity.toLocaleString()}</TableCell>
                       <TableCell>{formatCurrency(holding.buy_price)}</TableCell>
+                      <TableCell className="text-sm text-gray-600">
+                        {holding.buy_date
+                          ? format(new Date(holding.buy_date), "MMM dd, yyyy")
+                          : "N/A"}
+                      </TableCell>
                       <TableCell>
                         {formatCurrency(
                           holding.current_price || holding.buy_price
@@ -390,6 +453,6 @@ export const Holdings: React.FC = () => {
           )}
         </CardContent>
       </Card>
-    </div>
+    </>
   );
 };
