@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet, Link, useLocation, Navigate } from "react-router-dom";
-import { useUser, useLogout } from "../hooks/useAuth";
+import { useAuth } from "../contexts/AuthContext";
 import {
   BarChart3,
   Briefcase,
@@ -15,8 +15,7 @@ import { AppSidebar } from "./app-sidebar";
 import { SiteHeader } from "./site-header";
 
 export const Layout: React.FC = () => {
-  const { data: user, isLoading, error } = useUser();
-  const logoutMutation = useLogout();
+  const { user, isLoading, logout } = useAuth();
   const location = useLocation();
 
   // Show loading spinner while checking authentication
@@ -31,13 +30,13 @@ export const Layout: React.FC = () => {
     );
   }
 
-  // Redirect to auth if no user or authentication error
-  if (!user || error) {
+  // Redirect to auth if no user
+  if (!user) {
     return <Navigate to="/auth" replace />;
   }
 
   const handleLogout = () => {
-    logoutMutation.mutate();
+    logout();
   };
 
   const navigation = [

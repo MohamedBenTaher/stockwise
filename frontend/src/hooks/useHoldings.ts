@@ -1,5 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { typedApi, type HoldingCreate, type HoldingUpdate } from "../api/typed-api";
+import {
+  typedApi,
+  type HoldingCreate,
+  type HoldingUpdate,
+} from "../api/typed-api";
 
 export const useHoldings = () => {
   return useQuery({
@@ -13,8 +17,7 @@ export const useCreateHolding = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (holding: HoldingCreate) =>
-      typedApi.holdings.create(holding),
+    mutationFn: (holding: HoldingCreate) => typedApi.holdings.create(holding),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["holdings"] });
       queryClient.invalidateQueries({ queryKey: ["portfolio-summary"] });

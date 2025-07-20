@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { useLogin, useRegister } from "@/hooks";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Enhanced validation schema
 const baseSchema = {
@@ -143,10 +143,10 @@ const PasswordInput = ({
 
 export default function AuthForm() {
   const [isLoginMode, setIsLoginMode] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-
-  const loginMutation = useLogin();
-  const registerMutation = useRegister();
+  const { login, register } = useAuth();
 
   const schema = isLoginMode ? loginSchema : registerSchema;
   const form = useForm<LoginFormData | RegisterFormData>({
@@ -158,34 +158,33 @@ export default function AuthForm() {
     },
   });
 
-  const isLoading = loginMutation.isPending || registerMutation.isPending;
-  const error = loginMutation.error || registerMutation.error;
-
   const onSubmit = async (data: LoginFormData | RegisterFormData) => {
+    setIsLoading(true);
+    setError(null);
+
     try {
       if (isLoginMode) {
         const loginData = data as LoginFormData;
-        await loginMutation.mutateAsync({
-          username: loginData.email, // Use email as username
-          password: loginData.password,
-        });
+        await login(loginData.email, loginData.password);
         toast("Logged in successfully!");
-        // Wait a moment for authentication state to update
-        await new Promise((resolve) => setTimeout(resolve, 200));
         navigate("/dashboard");
       } else {
         const registerData = data as RegisterFormData;
-        await registerMutation.mutateAsync({
-          email: registerData.email,
-          password: registerData.password,
-          fullName: registerData.fullName,
-        });
+        await register(
+          registerData.email,
+          registerData.password,
+          registerData.fullName
+        );
         toast("Registration successful! Please log in.");
         setIsLoginMode(true);
         form.reset();
       }
     } catch (error: any) {
-      toast(`Error: ${error.response?.data?.detail || "An error occurred"}`);
+      const errorMessage = error.message || "An error occurred";
+      setError(errorMessage);
+      toast(`Error: ${errorMessage}`);
+    } finally {
+      setIsLoading(false);
     }
   };
   const toggleMode = () => {

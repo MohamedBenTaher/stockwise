@@ -46,13 +46,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing token in localStorage
-    const storedToken = localStorage.getItem("stockwise_token");
-    if (storedToken) {
-      setToken(storedToken);
-      // TODO: Verify token and get user data
-    }
-    setIsLoading(false);
+    const initializeAuth = async () => {
+      // Check for existing token in localStorage
+      const storedToken = localStorage.getItem("stockwise_token");
+      if (storedToken) {
+        setToken(storedToken);
+
+        // Verify token and get user data
+        try {
+          const userResponse = await fetch("/api/v1/auth/me", {
+            headers: {
+              Authorization: `Bearer ${storedToken}`,
+            },
+          });
+
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            setUser(userData);
+          } else {
+            // Token is invalid, remove it
+            localStorage.removeItem("stockwise_token");
+            setToken(null);
+          }
+        } catch (error) {
+          console.error("Token verification failed:", error);
+          localStorage.removeItem("stockwise_token");
+          setToken(null);
+        }
+      }
+      setIsLoading(false);
+    };
+
+    initializeAuth();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -116,8 +141,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       const userData = await response.json();
-
-      // Auto-login after registration
+      // Registration successful, now auto-login
       await login(email, password);
     } catch (error) {
       console.error("Registration error:", error);

@@ -1,4 +1,4 @@
-import openai
+import httpx
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 import json
@@ -14,9 +14,6 @@ from app.schemas.insight import (
     ConcentrationAlert,
 )
 from app.services.holdings import HoldingService
-
-# Configure OpenAI
-openai.api_key = settings.OPENAI_API_KEY
 
 
 class AIService:
@@ -38,7 +35,7 @@ class AIService:
 
         # Generate AI insights
         prompt = self._build_analysis_prompt(portfolio_summary, allocation_data)
-        ai_response = await self._call_openai(prompt)
+        ai_response = await self._call_groq_api(prompt)
 
         # Parse and structure the response
         insight = self._parse_ai_response(ai_response, request.user_id)
@@ -124,24 +121,79 @@ Focus on actionable insights. Keep language professional but accessible.
 """
         return prompt
 
-    async def _call_openai(self, prompt: str) -> str:
-        """Call OpenAI API."""
+    async def _call_groq_api(self, prompt: str) -> str:
+        """Call Groq API for free AI inference."""
         try:
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are a professional investment advisor.",
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {settings.GROQ_API_KEY}",
+                        "Content-Type": "application/json",
                     },
-                    {"role": "user", "content": prompt},
-                ],
-                max_tokens=2000,
-                temperature=0.3,
-            )
-            return response.choices[0].message.content
+                    json={
+                        "model": "llama-3-70b-instruct",  # Free Groq model
+                        "temperature": 0.3,
+                        "top_p": 0.9,
+                        "frequency_penalty": 0.0,
+                        "presence_penalty": 0.0,
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": "You are a professional investment advisor.",
+                            },
+                            {"role": "user", "content": prompt},
+                        ],
+                        "max_tokens": 2000,
+                        "temperature": 0.3,
+                    },
+                    timeout=30.0,
+                )
+
+                if response.status_code == 200:
+                    result = response.json()
+                    return result["choices"][0]["message"]["content"]
+                else:
+                    print(f"Groq API error: {response.status_code}")
+                    # Try Hugging Face as fallback
+                    return await self._call_huggingface_api(prompt)
+
         except Exception as e:
-            # Fallback response in case of API failure
+            print(f"Groq API call failed: {e}")
+            # Try Hugging Face as fallback
+            return await self._call_huggingface_api(prompt)
+
+    async def _call_huggingface_api(self, prompt: str) -> str:
+        """Call Hugging Face Inference API as fallback."""
+        try:
+            async with httpx.AsyncClient() as client:
+                # Use a free model like microsoft/DialoGPT-medium
+                response = await client.post(
+                    "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium",
+                    headers={
+                        "Authorization": f"Bearer {settings.HUGGINGFACE_API_KEY}",
+                    },
+                    json={
+                        "inputs": f"Investment advisor: {prompt[:500]}...",
+                        "parameters": {
+                            "max_new_tokens": 500,
+                            "temperature": 0.3,
+                        },
+                    },
+                    timeout=30.0,
+                )
+
+                if response.status_code == 200:
+                    result = response.json()
+                    if isinstance(result, list) and result:
+                        return result[0].get("generated_text", "")
+                    return ""
+                else:
+                    print(f"HuggingFace API error: {response.status_code}")
+                    return self._get_fallback_response()
+
+        except Exception as e:
+            print(f"HuggingFace API call failed: {e}")
             return self._get_fallback_response()
 
     def _parse_ai_response(self, ai_response: str, user_id: int) -> AIInsight:
