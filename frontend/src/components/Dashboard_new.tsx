@@ -20,11 +20,7 @@ import {
 import { Button } from "./ui/button";
 import { Alert, AlertDescription } from "./ui/alert";
 import { Badge } from "./ui/badge";
-import {
-  usePortfolioSummary,
-  useHoldings,
-  useAllocationData,
-} from "../hooks/useHoldings";
+import { usePortfolioSummary, useHoldings } from "../hooks/useHoldings";
 import { useLatestInsights } from "../hooks/useInsights";
 import type { Holding } from "../types/generated";
 
@@ -45,9 +41,6 @@ export const Dashboard: React.FC = () => {
   } = useHoldings();
 
   const { data: insights, isLoading: insightsLoading } = useLatestInsights();
-
-  const { data: allocationData, isLoading: allocationLoading } =
-    useAllocationData();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -369,27 +362,6 @@ export const Dashboard: React.FC = () => {
                   </p>
                 </div>
 
-                {/* Portfolio Performance Summary */}
-                {portfolioSummary && (
-                  <div className="p-3 rounded-lg bg-gray-50 border border-gray-200">
-                    <p className="text-sm font-medium text-gray-900">
-                      Portfolio Performance
-                    </p>
-                    <p
-                      className={`text-xs mt-1 ${
-                        portfolioSummary.total_profit_loss_percentage >= 0
-                          ? "text-green-700"
-                          : "text-red-700"
-                      }`}
-                    >
-                      {formatPercentage(
-                        portfolioSummary.total_profit_loss_percentage
-                      )}{" "}
-                      overall return
-                    </p>
-                  </div>
-                )}
-
                 {insights.insight?.key_recommendations
                   ?.slice(0, 2)
                   .map((rec, index) => (
@@ -479,29 +451,6 @@ export const Dashboard: React.FC = () => {
                           worstPerformers[0].profit_loss_percentage
                         )}
                       </Badge>
-                    </div>
-                  )}
-
-                {/* Sector Allocation */}
-                {allocationData &&
-                  Object.keys(allocationData.by_sector).length > 0 && (
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-gray-900">
-                        Top Sectors
-                      </p>
-                      {Object.entries(allocationData.by_sector)
-                        .slice(0, 3)
-                        .map(([sector, percentage]: [string, number]) => (
-                          <div
-                            key={sector}
-                            className="flex justify-between items-center text-sm"
-                          >
-                            <span className="text-gray-600">{sector}</span>
-                            <span className="font-medium">
-                              {percentage.toFixed(1)}%
-                            </span>
-                          </div>
-                        ))}
                     </div>
                   )}
 
