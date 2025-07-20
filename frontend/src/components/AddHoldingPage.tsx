@@ -27,7 +27,7 @@ import {
 } from "./ui/select";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { StockTickerCombobox } from "./StockTickerCombobox";
+import StockTickerCombobox from "./StockTickerCombobox";
 import { useCreateHolding } from "@/hooks";
 
 const addHoldingSchema = z.object({
@@ -35,9 +35,7 @@ const addHoldingSchema = z.object({
   asset_type: z.enum(["stock", "etf", "crypto", "bond", "commodity"]),
   quantity: z.number().positive("Quantity must be positive"),
   buy_price: z.number().positive("Price must be positive"),
-  buy_date: z.date({
-    required_error: "Please select a purchase date",
-  }),
+  buy_date: z.date().default(() => new Date()),
 });
 
 type AddHoldingFormData = z.infer<typeof addHoldingSchema>;
@@ -131,9 +129,8 @@ export const AddHoldingPage: React.FC = () => {
                         <FormControl>
                           <StockTickerCombobox
                             value={field.value}
-                            onValueChange={field.onChange}
+                            onChange={field.onChange}
                             placeholder="Search for a stock..."
-                            className="w-full"
                           />
                         </FormControl>
                         <FormMessage />

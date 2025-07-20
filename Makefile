@@ -1,7 +1,7 @@
 # StockWise Development Makefile
 # Use this to set up and manage your development environment
 
-.PHONY: help setup dev-up dev-down dev-restart clean logs migrate test lint format install
+.PHONY: help setup dev-up dev-down dev-restart clean logs migrate test lint format install test-unit test-integration test-all
 
 # Default target
 help:
@@ -19,6 +19,13 @@ help:
 	@echo "  migrate-create - Create new migration"
 	@echo "  celery         - Start Celery worker locally"
 	@echo "  celery-beat    - Start Celery beat scheduler locally"
+	@echo ""
+	@echo "Testing:"
+	@echo "  test-unit      - Run unit tests only"
+	@echo "  test-integration - Run integration tests (requires services)"
+	@echo "  test-all       - Run all tests"
+	@echo "  test-cov       - Run tests with coverage report"
+	@echo "  test-runner    - Run the comprehensive test suite"
 	@echo ""
 	@echo "Development:"
 	@echo "  logs           - Show logs from Docker services"
@@ -172,6 +179,33 @@ install:
 	@echo "📦 Installing Python dependencies..."
 	@pip install -r requirements.txt
 	@echo "✅ Dependencies installed"
+
+# Testing Commands
+test-unit:
+	@echo "🧪 Running unit tests..."
+	@pytest tests/unit -v --tb=short -m unit
+
+test-integration:
+	@echo "🧪 Running integration tests (requires services)..."
+	@pytest tests/integration -v --tb=short -m integration
+
+test-all:
+	@echo "🧪 Running all tests..."
+	@pytest tests/ -v --tb=short
+
+test-cov:
+	@echo "🧪 Running tests with coverage..."
+	@pytest tests/ --cov=app --cov-report=html --cov-report=term
+
+test-runner:
+	@echo "🧪 Running comprehensive test suite..."
+	@python run_tests.py
+
+# Clean up old test files
+clean-old-tests:
+	@echo "🧹 Cleaning up old test files..."
+	@rm -f test_*.py
+	@echo "✅ Old test files removed"
 
 # Development shortcuts
 db-shell:

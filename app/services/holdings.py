@@ -9,23 +9,20 @@ from app.schemas.holding import (
     PortfolioSummary,
     AllocationData,
 )
-from app.services.prices import PriceService
+from app.services.prices import price_service
 
 
 class HoldingService:
     def __init__(self, db: AsyncSession):
         self.db = db
-        self.price_service = PriceService()
 
     async def create_holding(
         self, user_id: int, holding_data: HoldingCreate
     ) -> Holding:
-        """Create a new holding."""
+        """Create a new holding using cached prices first."""
         try:
-            # Get current price
-            current_price = await self.price_service.get_current_price(
-                holding_data.ticker
-            )
+            # Get current price from cache first, fallback to API only if needed
+            current_price = await price_service.get_current_price(holding_data.ticker)
 
             # Ensure current_price is not None or 0
             if current_price is None or current_price <= 0:
@@ -41,11 +38,10 @@ class HoldingService:
                 buy_date=holding_data.buy_date,
             )
 
-            # Get additional data (sector, country, etc.)
+            # Get additional data from cache first
+            # (metadata is cached by startup service)
             try:
-                metadata = await self.price_service.get_asset_metadata(
-                    holding_data.ticker
-                )
+                metadata = await price_service.get_asset_metadata(holding_data.ticker)
                 if metadata:
                     db_holding.sector = metadata.get("sector")
                     db_holding.country = metadata.get("country")
@@ -96,17 +92,29 @@ class HoldingService:
             raise
 
     async def get_user_holdings(self, user_id: int) -> List[Holding]:
-        """Get all holdings for a user with calculated fields."""
+        """Get all holdings for a user with calculated fields - optimized."""
         result = await self.db.execute(
             select(HoldingModel).where(HoldingModel.user_id == user_id)
         )
         holdings = result.scalars().all()
 
+        if not holdings:
+            return []
+
+        # Get all unique tickers for batch price fetching
+        tickers = list(set(holding.ticker for holding in holdings))
+
+        # Fetch all prices in batch for better performance
+        price_dict = await price_service.get_multiple_prices(tickers)
+
         # Add calculated fields
         enriched_holdings = []
         for holding in holdings:
-            # Update current price
-            current_price = await self.price_service.get_current_price(holding.ticker)
+            # Get price from batch results
+            current_price = price_dict.get(holding.ticker, 0.0)
+            if current_price <= 0:
+                current_price = holding.buy_price  # Fallback to buy price
+
             holding.current_price = current_price
 
             # Calculate derived fields
@@ -167,7 +175,7 @@ class HoldingService:
 
         # Update current price if ticker changed
         if "ticker" in update_data:
-            current_price = await self.price_service.get_current_price(holding.ticker)
+            current_price = await price_service.get_current_price(holding.ticker)
             holding.current_price = current_price
 
         await self.db.commit()

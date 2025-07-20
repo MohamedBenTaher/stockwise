@@ -1,9 +1,14 @@
-"use client";
-
-import * as React from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Check,
+  ChevronsUpDown,
+  Plus,
+  Search,
+  TrendingUp,
+  Clock,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "./ui/button";
 import {
   Command,
   CommandEmpty,
@@ -11,160 +16,536 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  CommandSeparator,
+} from "./ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Badge } from "./ui/badge";
+import api from "../api/api";
 
-// Popular US stocks for demonstration
-const popularStocks = [
-  { value: "AAPL", label: "AAPL - Apple Inc." },
-  { value: "MSFT", label: "MSFT - Microsoft Corporation" },
-  { value: "GOOGL", label: "GOOGL - Alphabet Inc." },
-  { value: "AMZN", label: "AMZN - Amazon.com Inc." },
-  { value: "NVDA", label: "NVDA - NVIDIA Corporation" },
-  { value: "TSLA", label: "TSLA - Tesla, Inc." },
-  { value: "META", label: "META - Meta Platforms, Inc." },
-  { value: "BRK.B", label: "BRK.B - Berkshire Hathaway Inc." },
-  { value: "V", label: "V - Visa Inc." },
-  { value: "JNJ", label: "JNJ - Johnson & Johnson" },
-  { value: "WMT", label: "WMT - Walmart Inc." },
-  { value: "JPM", label: "JPM - JPMorgan Chase & Co." },
-  { value: "PG", label: "PG - Procter & Gamble Company" },
-  { value: "UNH", label: "UNH - UnitedHealth Group Incorporated" },
-  { value: "HD", label: "HD - The Home Depot, Inc." },
-  { value: "MA", label: "MA - Mastercard Incorporated" },
-  { value: "DIS", label: "DIS - The Walt Disney Company" },
-  { value: "ADBE", label: "ADBE - Adobe Inc." },
-  { value: "BAC", label: "BAC - Bank of America Corporation" },
-  { value: "CRM", label: "CRM - Salesforce, Inc." },
-  { value: "NFLX", label: "NFLX - Netflix, Inc." },
-  { value: "XOM", label: "XOM - Exxon Mobil Corporation" },
-  { value: "CVX", label: "CVX - Chevron Corporation" },
-  { value: "AMD", label: "AMD - Advanced Micro Devices, Inc." },
-  { value: "PFE", label: "PFE - Pfizer Inc." },
-  { value: "TMO", label: "TMO - Thermo Fisher Scientific Inc." },
-  { value: "COST", label: "COST - Costco Wholesale Corporation" },
-  { value: "ABBV", label: "ABBV - AbbVie Inc." },
-  { value: "ACN", label: "ACN - Accenture plc" },
-  { value: "MRK", label: "MRK - Merck & Co., Inc." },
-  { value: "LLY", label: "LLY - Eli Lilly and Company" },
-  { value: "PEP", label: "PEP - PepsiCo, Inc." },
-  { value: "AVGO", label: "AVGO - Broadcom Inc." },
-  { value: "TXN", label: "TXN - Texas Instruments Incorporated" },
-  { value: "ABT", label: "ABT - Abbott Laboratories" },
-  { value: "ORCL", label: "ORCL - Oracle Corporation" },
-  { value: "NKE", label: "NKE - NIKE, Inc." },
-  { value: "DHR", label: "DHR - Danaher Corporation" },
-  { value: "VZ", label: "VZ - Verizon Communications Inc." },
-  { value: "COP", label: "COP - ConocoPhillips" },
-  // ETFs
-  { value: "SPY", label: "SPY - SPDR S&P 500 ETF Trust" },
-  { value: "QQQ", label: "QQQ - Invesco QQQ Trust" },
-  { value: "VTI", label: "VTI - Vanguard Total Stock Market ETF" },
-  { value: "IWM", label: "IWM - iShares Russell 2000 ETF" },
-  { value: "EEM", label: "EEM - iShares MSCI Emerging Markets ETF" },
-  { value: "GLD", label: "GLD - SPDR Gold Shares" },
-  { value: "SLV", label: "SLV - iShares Silver Trust" },
-  { value: "TLT", label: "TLT - iShares 20+ Year Treasury Bond ETF" },
-  // Crypto ETFs
-  { value: "BITO", label: "BITO - ProShares Bitcoin Strategy ETF" },
-];
+interface Stock {
+  value: string;
+  label: string;
+  sector?: string;
+  industry?: string;
+  market_cap?: string;
+  exchange?: string;
+  isCustom?: boolean;
+}
 
 interface StockTickerComboboxProps {
   value?: string;
-  onValueChange?: (value: string) => void;
+  onChange: (value: string) => void;
   placeholder?: string;
-  className?: string;
+  disabled?: boolean;
+  allowCustomAssets?: boolean; // New prop to allow custom assets like crypto, commodities
 }
 
-export function StockTickerCombobox({
+const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
   value,
-  onValueChange,
-  placeholder = "Search stocks...",
-  className,
-}: StockTickerComboboxProps) {
-  const [open, setOpen] = React.useState(false);
-  const [searchValue, setSearchValue] = React.useState("");
+  onChange,
+  placeholder = "Select stock ticker...",
+  disabled = false,
+  allowCustomAssets = true,
+}) => {
+  const [open, setOpen] = useState(false);
+  const [customDialogOpen, setCustomDialogOpen] = useState(false);
+  const [stocks, setStocks] = useState<Stock[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Stock[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [customTicker, setCustomTicker] = useState("");
+  const [customName, setCustomName] = useState("");
+  const [customType, setCustomType] = useState<
+    "stock" | "crypto" | "commodity" | "other"
+  >("stock");
+  const [lastCacheUpdate, setLastCacheUpdate] = useState<number>(0);
 
-  // Filter stocks based on search
-  const filteredStocks = React.useMemo(() => {
-    if (!searchValue) return popularStocks.slice(0, 20); // Show top 20 by default
+  // Enhanced fallback stock list with more variety
+  const fallbackStocks: Stock[] = [
+    { value: "AAPL", label: "AAPL - Apple Inc.", sector: "Technology" },
+    {
+      value: "MSFT",
+      label: "MSFT - Microsoft Corporation",
+      sector: "Technology",
+    },
+    { value: "GOOGL", label: "GOOGL - Alphabet Inc.", sector: "Technology" },
+    {
+      value: "AMZN",
+      label: "AMZN - Amazon.com Inc.",
+      sector: "Consumer Cyclical",
+    },
+    { value: "NVDA", label: "NVDA - NVIDIA Corporation", sector: "Technology" },
+    { value: "TSLA", label: "TSLA - Tesla, Inc.", sector: "Consumer Cyclical" },
+    {
+      value: "META",
+      label: "META - Meta Platforms, Inc.",
+      sector: "Technology",
+    },
+    {
+      value: "BRK.B",
+      label: "BRK.B - Berkshire Hathaway Inc.",
+      sector: "Financial Services",
+    },
+    { value: "V", label: "V - Visa Inc.", sector: "Financial Services" },
+    { value: "JNJ", label: "JNJ - Johnson & Johnson", sector: "Healthcare" },
+    { value: "WMT", label: "WMT - Walmart Inc.", sector: "Consumer Defensive" },
+    {
+      value: "JPM",
+      label: "JPM - JPMorgan Chase & Co.",
+      sector: "Financial Services",
+    },
+    {
+      value: "PG",
+      label: "PG - Procter & Gamble Company",
+      sector: "Consumer Defensive",
+    },
+    { value: "UNH", label: "UNH - UnitedHealth Group", sector: "Healthcare" },
+    {
+      value: "HD",
+      label: "HD - The Home Depot, Inc.",
+      sector: "Consumer Cyclical",
+    },
+    {
+      value: "MA",
+      label: "MA - Mastercard Incorporated",
+      sector: "Financial Services",
+    },
+    {
+      value: "DIS",
+      label: "DIS - The Walt Disney Company",
+      sector: "Communication Services",
+    },
+    { value: "ADBE", label: "ADBE - Adobe Inc.", sector: "Technology" },
+    {
+      value: "NFLX",
+      label: "NFLX - Netflix, Inc.",
+      sector: "Communication Services",
+    },
+    { value: "XOM", label: "XOM - Exxon Mobil Corporation", sector: "Energy" },
+    { value: "SPY", label: "SPY - SPDR S&P 500 ETF Trust", sector: "ETF" },
+    { value: "QQQ", label: "QQQ - Invesco QQQ Trust", sector: "ETF" },
+    {
+      value: "VTI",
+      label: "VTI - Vanguard Total Stock Market ETF",
+      sector: "ETF",
+    },
+    { value: "IWM", label: "IWM - iShares Russell 2000 ETF", sector: "ETF" },
+    {
+      value: "EEM",
+      label: "EEM - iShares MSCI Emerging Markets ETF",
+      sector: "ETF",
+    },
+    { value: "GLD", label: "GLD - SPDR Gold Shares", sector: "Commodities" },
+    {
+      value: "SLV",
+      label: "SLV - iShares Silver Trust",
+      sector: "Commodities",
+    },
+    {
+      value: "BTC-USD",
+      label: "BTC-USD - Bitcoin USD",
+      sector: "Cryptocurrency",
+    },
+    {
+      value: "ETH-USD",
+      label: "ETH-USD - Ethereum USD",
+      sector: "Cryptocurrency",
+    },
+    {
+      value: "OTHER",
+      label: "OTHER - Enter Custom Asset",
+      sector: "Custom",
+      isCustom: true,
+    },
+  ];
 
-    return popularStocks.filter(
-      (stock) =>
-        stock.value.toLowerCase().includes(searchValue.toLowerCase()) ||
-        stock.label.toLowerCase().includes(searchValue.toLowerCase())
-    );
-  }, [searchValue]);
+  // Cache management for popular stocks
+  const getCachedStocks = useCallback(() => {
+    try {
+      const cached = localStorage.getItem("stockwise_popular_stocks");
+      const cacheTime = localStorage.getItem("stockwise_popular_stocks_time");
 
-  const selectedStock = popularStocks.find((stock) => stock.value === value);
+      if (cached && cacheTime) {
+        const cacheAge = Date.now() - parseInt(cacheTime);
+        // Cache for 24 hours (86400000 ms)
+        if (cacheAge < 86400000) {
+          setLastCacheUpdate(parseInt(cacheTime));
+          return JSON.parse(cached);
+        }
+      }
+    } catch (error) {
+      console.error("Error reading cached stocks:", error);
+    }
+    return null;
+  }, []);
+
+  const setCachedStocks = useCallback((stockData: Stock[]) => {
+    try {
+      const timestamp = Date.now();
+      localStorage.setItem(
+        "stockwise_popular_stocks",
+        JSON.stringify(stockData)
+      );
+      localStorage.setItem(
+        "stockwise_popular_stocks_time",
+        timestamp.toString()
+      );
+      setLastCacheUpdate(timestamp);
+    } catch (error) {
+      console.error("Error caching stocks:", error);
+    }
+  }, []);
+
+  // Load popular stocks with caching
+  useEffect(() => {
+    const loadPopularStocks = async () => {
+      try {
+        setIsLoading(true);
+
+        // Try to get from cache first
+        const cachedStocks = getCachedStocks();
+        if (cachedStocks) {
+          setStocks(cachedStocks);
+          setIsLoading(false);
+          return;
+        }
+
+        // Fetch from API with enhanced caching
+        const response = await api.get("/api/v1/stocks/popular");
+        const apiStocks = response.data;
+
+        // Add the "OTHER" option at the end
+        const enhancedStocks = [
+          ...apiStocks,
+          {
+            value: "OTHER",
+            label: "OTHER - Enter Custom Asset",
+            sector: "Custom",
+            isCustom: true,
+          },
+        ];
+
+        setStocks(enhancedStocks);
+        setCachedStocks(enhancedStocks);
+      } catch (error) {
+        console.error("Failed to load popular stocks:", error);
+        // Fallback to enhanced static list with OTHER option
+        setStocks(fallbackStocks);
+        setCachedStocks(fallbackStocks);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPopularStocks();
+  }, [getCachedStocks, setCachedStocks]);
+
+  // Search stocks when query changes
+  useEffect(() => {
+    const searchStocks = async () => {
+      if (!searchQuery || searchQuery.length < 2) {
+        setSearchResults([]);
+        return;
+      }
+
+      try {
+        setIsSearching(true);
+        const response = await api.get(`/api/v1/stocks/search`, {
+          params: { q: searchQuery, limit: 10 },
+        });
+        setSearchResults(response.data);
+      } catch (error) {
+        console.error("Failed to search stocks:", error);
+        // Fallback to local filtering
+        const filtered = stocks.filter(
+          (stock) =>
+            stock.value.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            stock.label.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setSearchResults(filtered);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const timeoutId = setTimeout(searchStocks, 300); // Debounce
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, stocks]);
+
+  const handleSelect = (selectedValue: string) => {
+    if (selectedValue === "OTHER") {
+      setCustomDialogOpen(true);
+      setOpen(false);
+      return;
+    }
+    onChange(selectedValue);
+    setOpen(false);
+  };
+
+  const handleCustomStock = async () => {
+    if (!customTicker.trim()) return;
+
+    const ticker = customTicker.toUpperCase().trim();
+
+    try {
+      // Validate the ticker
+      const response = await api.get(`/api/v1/stocks/validate/${ticker}`);
+      if (response.data.valid) {
+        // Add to stocks list and select it
+        const newStock = {
+          value: ticker,
+          label: customName.trim()
+            ? `${ticker} - ${customName.trim()}`
+            : ticker,
+        };
+        setStocks((prev) => [newStock, ...prev]);
+        onChange(ticker);
+        setCustomDialogOpen(false);
+        setCustomTicker("");
+        setCustomName("");
+      } else {
+        alert("Ticker not found. Please check the symbol and try again.");
+      }
+    } catch (error) {
+      console.error("Failed to validate ticker:", error);
+      // Allow custom entry anyway for flexibility
+      const newStock = {
+        value: ticker,
+        label: customName.trim() ? `${ticker} - ${customName.trim()}` : ticker,
+      };
+      setStocks((prev) => [newStock, ...prev]);
+      onChange(ticker);
+      setCustomDialogOpen(false);
+      setCustomTicker("");
+      setCustomName("");
+    }
+  };
+
+  const selectedStock = stocks.find((stock) => stock.value === value);
+  const displayedStocks = searchQuery ? searchResults : stocks;
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className={cn("w-full justify-between", className)}
-        >
-          {selectedStock ? (
-            <span className="truncate">{selectedStock.label}</span>
-          ) : (
-            <span className="text-muted-foreground">{placeholder}</span>
-          )}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
-        <Command>
-          <CommandInput
-            placeholder="Search stocks..."
-            value={searchValue}
-            onValueChange={setSearchValue}
-          />
-          <CommandList>
-            <CommandEmpty>
-              <div className="text-center py-4">
-                <p className="text-sm text-muted-foreground">
-                  No stocks found.
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Try searching by ticker symbol or company name
-                </p>
-              </div>
-            </CommandEmpty>
-            <CommandGroup>
-              {filteredStocks.map((stock) => (
+    <>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between"
+            disabled={disabled}
+          >
+            {selectedStock ? (
+              <span className="flex flex-col items-start">
+                <span className="font-medium">{selectedStock.value}</span>
+                {selectedStock.sector && (
+                  <span className="text-xs text-muted-foreground">
+                    {selectedStock.sector}
+                  </span>
+                )}
+              </span>
+            ) : (
+              placeholder
+            )}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[400px] p-0">
+          <Command>
+            <div className="flex items-center justify-between p-2 border-b">
+              <CommandInput
+                placeholder="Search stocks..."
+                value={searchQuery}
+                onValueChange={setSearchQuery}
+                className="flex-1 border-0 focus:ring-0"
+              />
+              {lastCacheUpdate > 0 && (
+                <Badge variant="secondary" className="ml-2 text-xs">
+                  <Clock className="h-3 w-3 mr-1" />
+                  Cached
+                </Badge>
+              )}
+            </div>
+            <CommandList>
+              <CommandEmpty>
+                {isSearching ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Search className="h-4 w-4 animate-spin mr-2" />
+                    Searching...
+                  </div>
+                ) : (
+                  <div className="py-4">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      No stocks found.
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setCustomDialogOpen(true);
+                        setOpen(false);
+                      }}
+                      className="w-full"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Custom Stock
+                    </Button>
+                  </div>
+                )}
+              </CommandEmpty>
+
+              {displayedStocks.length > 0 && (
+                <CommandGroup>
+                  {displayedStocks.map((stock) => (
+                    <CommandItem
+                      key={stock.value}
+                      value={stock.value}
+                      onSelect={() => handleSelect(stock.value)}
+                      className="flex flex-col items-start py-3"
+                    >
+                      <div className="flex items-center w-full">
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            value === stock.value ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        <div className="flex-1">
+                          <div className="font-medium">{stock.value}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {stock.label.replace(`${stock.value} - `, "")}
+                          </div>
+                          {(stock.sector || stock.exchange) && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {[stock.sector, stock.exchange]
+                                .filter(Boolean)
+                                .join(" • ")}
+                            </div>
+                          )}
+                        </div>
+                        {stock.isCustom && (
+                          <Badge variant="outline" className="ml-2">
+                            Custom
+                          </Badge>
+                        )}
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+
+              <CommandSeparator />
+              <CommandGroup>
                 <CommandItem
-                  key={stock.value}
-                  value={stock.value}
-                  onSelect={(currentValue: string) => {
-                    onValueChange?.(currentValue === value ? "" : currentValue);
+                  onSelect={() => {
+                    setCustomDialogOpen(true);
                     setOpen(false);
                   }}
+                  className="flex items-center py-2"
                 >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === stock.value ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  <div className="flex flex-col">
-                    <span className="font-medium">{stock.value}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {stock.label.split(" - ")[1]}
-                    </span>
-                  </div>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Custom Stock
                 </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+
+      {/* Enhanced Custom Stock Dialog */}
+      <Dialog open={customDialogOpen} onOpenChange={setCustomDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add Custom Asset</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="type">Asset Type</Label>
+              <select
+                id="type"
+                value={customType}
+                onChange={(e) =>
+                  setCustomType(e.target.value as typeof customType)
+                }
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="stock">Stock</option>
+                <option value="crypto">Cryptocurrency</option>
+                <option value="commodity">Commodity</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="ticker">Symbol/Ticker *</Label>
+              <Input
+                id="ticker"
+                placeholder={
+                  customType === "crypto"
+                    ? "e.g., BTC-USD"
+                    : customType === "commodity"
+                    ? "e.g., GLD"
+                    : "e.g., AAPL"
+                }
+                value={customTicker}
+                onChange={(e) => setCustomTicker(e.target.value.toUpperCase())}
+                className="uppercase"
+              />
+              <p className="text-xs text-muted-foreground">
+                {customType === "crypto" &&
+                  "Use format: SYMBOL-USD (e.g., BTC-USD, ETH-USD)"}
+                {customType === "commodity" &&
+                  "Use commodity ETF symbols (e.g., GLD for gold, SLV for silver)"}
+                {customType === "stock" && "Enter stock ticker symbol"}
+                {customType === "other" && "Enter any symbol or identifier"}
+              </p>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="name">Name (Optional)</Label>
+              <Input
+                id="name"
+                placeholder={`e.g., ${
+                  customType === "crypto"
+                    ? "Bitcoin"
+                    : customType === "commodity"
+                    ? "Gold ETF"
+                    : "Company Name"
+                }`}
+                value={customName}
+                onChange={(e) => setCustomName(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCustomDialogOpen(false);
+                setCustomTicker("");
+                setCustomName("");
+                setCustomType("stock");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleCustomStock} disabled={!customTicker.trim()}>
+              Add{" "}
+              {customType === "stock"
+                ? "Stock"
+                : customType === "crypto"
+                ? "Crypto"
+                : customType === "commodity"
+                ? "Commodity"
+                : "Asset"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
-}
+};
+
+export default StockTickerCombobox;

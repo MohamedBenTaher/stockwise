@@ -6,8 +6,11 @@ from app.api.holdings import router as holdings_router
 from app.api.insights import router as insights_router
 from app.api.auth import router as auth_router
 from app.api.risk import router as risk_router
+from app.api.stocks import router as stocks_router
 from app.config import settings
+from app.services.startup import startup_service
 import logging
+import asyncio
 
 
 logger_ = logging.getLogger(__name__)
@@ -30,6 +33,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.on_event("startup")
+async def startup_event():
+    """Application startup event handler."""
+    logger_.info("🚀 Starting StockWise API...")
+
+    # Preload popular stock data into cache
+    try:
+        await startup_service.preload_all_startup_data()
+        logger_.info("✅ Startup data preload completed")
+    except Exception as e:
+        logger_.error(f"❌ Startup data preload failed: {e}")
+        # Don't fail startup if preload fails
+
+
 # Include routers
 app.include_router(auth_router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(
@@ -39,6 +57,9 @@ app.include_router(
     insights_router, prefix=f"{settings.API_V1_STR}/insights", tags=["insights"]
 )
 app.include_router(risk_router, prefix=f"{settings.API_V1_STR}/risk", tags=["risk"])
+app.include_router(
+    stocks_router, prefix=f"{settings.API_V1_STR}/stocks", tags=["stocks"]
+)
 
 
 @app.get("/")
