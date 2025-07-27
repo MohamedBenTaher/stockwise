@@ -128,3 +128,25 @@ export interface RiskHeatmapData {
     color_intensity: number;
   }>;
 }
+
+// Chart data types
+export interface PortfolioPerformanceData {
+  date: string;
+  value: number;
+  gain?: number;
+}
+
+export interface AllocationDataPoint {
+  symbol: string;
+  name: string;
+  value: number;
+  percentage: number;
+  color?: string;
+}
+
+export interface PerformanceComparisonData {
+  date: string;
+  portfolio: number;
+  sp500?: number;
+  nasdaq?: number;
+}

@@ -7,10 +7,10 @@ from app.api.insights import router as insights_router
 from app.api.auth import router as auth_router
 from app.api.risk import router as risk_router
 from app.api.stocks import router as stocks_router
+from app.api.charts import router as charts_router
 from app.config import settings
 from app.services.startup import startup_service
 import logging
-import asyncio
 
 
 logger_ = logging.getLogger(__name__)
@@ -59,6 +59,9 @@ app.include_router(
 app.include_router(risk_router, prefix=f"{settings.API_V1_STR}/risk", tags=["risk"])
 app.include_router(
     stocks_router, prefix=f"{settings.API_V1_STR}/stocks", tags=["stocks"]
+)
+app.include_router(
+    charts_router, prefix=f"{settings.API_V1_STR}/charts", tags=["charts"]
 )
 
 

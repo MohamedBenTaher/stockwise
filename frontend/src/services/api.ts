@@ -147,4 +147,27 @@ export const riskApi = {
   },
 };
 
+export const chartsApi = {
+  getPortfolioPerformance: async (period: string = "1Y"): Promise<any[]> => {
+    const response = await api.get(
+      `/charts/portfolio-performance?period=${period}`
+    );
+    return response.data;
+  },
+
+  getPerformanceComparison: async (period: string = "1Y"): Promise<any[]> => {
+    const response = await api.get(
+      `/charts/performance-comparison?period=${period}`
+    );
+    return response.data;
+  },
+
+  getAllocationHistory: async (period: string = "1Y"): Promise<any[]> => {
+    const response = await api.get(
+      `/charts/allocation-history?period=${period}`
+    );
+    return response.data;
+  },
+};
+
 export default api;

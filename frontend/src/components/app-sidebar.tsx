@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   CameraIcon as IconCamera,
   BarChartIcon as IconChartBar,
+  TrendingUpIcon as IconTrendingUp,
   LayoutDashboard as IconDashboard,
   DatabaseIcon as IconDatabase,
   FileCodeIcon as IconFileAi,
@@ -54,6 +55,11 @@ const data = {
       title: "Insights",
       url: "/insights",
       icon: IconChartBar,
+    },
+    {
+      title: "Charts",
+      url: "/charts",
+      icon: IconTrendingUp,
     },
     {
       title: "Risk Analysis",

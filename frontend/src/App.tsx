@@ -1,10 +1,10 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Dashboard } from "./components/Dashboard";
 import { Holdings } from "./components/Holdings";
 import { AddHoldingPage } from "./components/AddHoldingPage";
 import { Insights } from "./components/Insights";
 import { RiskAnalysis } from "./components/RiskAnalysis";
+import Charts from "./pages/Charts";
 import AuthForm from "./components/Auth_new";
 import { Layout } from "./components/Layout";
 import { Toaster } from "./components/ui/sonner";
@@ -23,6 +23,7 @@ function App() {
             <Route path="holdings/add" element={<AddHoldingPage />} />
             <Route path="insights" element={<Insights />} />
             <Route path="risk" element={<RiskAnalysis />} />
+            <Route path="charts" element={<Charts />} />
           </Route>
         </Routes>
         <Toaster />

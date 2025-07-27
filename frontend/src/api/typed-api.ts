@@ -17,6 +17,10 @@ import type {
   InsightResponse,
   Token,
   AssetType,
+  PortfolioHistoryPoint,
+  PerformanceComparisonPoint,
+  AllocationChartData,
+  PortfolioMetrics,
 } from "../types/generated";
 
 // Re-export types for convenience
@@ -235,6 +239,35 @@ export const typedApi = {
 
     getMetrics: async (): Promise<any> => {
       const response = await apiClient.get("/risk/metrics");
+      return response.data;
+    },
+  },
+  charts: {
+    getPortfolioHistory: async (
+      days: number = 30
+    ): Promise<PortfolioHistoryPoint[]> => {
+      const response = await apiClient.get(
+        `/charts/portfolio-history?days=${days}`
+      );
+      return response.data;
+    },
+
+    getPerformanceComparison: async (
+      days: number = 30
+    ): Promise<PerformanceComparisonPoint[]> => {
+      const response = await apiClient.get(
+        `/charts/performance-comparison?days=${days}`
+      );
+      return response.data;
+    },
+
+    getAllocationData: async (): Promise<AllocationChartData> => {
+      const response = await apiClient.get("/charts/allocation-data");
+      return response.data;
+    },
+
+    getPortfolioMetrics: async (): Promise<PortfolioMetrics> => {
+      const response = await apiClient.get("/charts/portfolio-metrics");
       return response.data;
     },
   },
