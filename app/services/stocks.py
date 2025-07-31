@@ -153,6 +153,16 @@ class StockService:
     async def _get_stock_overview(self, ticker: str) -> Dict[str, str]:
         """Get stock overview from Alpha Vantage."""
         try:
+            if not settings.ALPHA_VANTAGE_API_KEY:
+                logger.debug("Alpha Vantage API key not set, skipping overview fetch")
+                return {
+                    "value": ticker,
+                    "label": f"{ticker} - {ticker}",
+                    "sector": "",
+                    "industry": "",
+                    "market_cap": "",
+                    "exchange": "",
+                }
             async with httpx.AsyncClient() as client:
                 params = {
                     "function": "OVERVIEW",
@@ -361,6 +371,10 @@ class StockService:
     async def _fetch_av_quote(self, ticker: str) -> Optional[Dict[str, Any]]:
         """Fetch quote from Alpha Vantage."""
         try:
+
+            if not settings.ALPHA_VANTAGE_API_KEY:
+                logger.debug("Alpha Vantage API key not set, skipping quote fetch")
+                return None
             async with httpx.AsyncClient() as client:
                 params = {
                     "function": "GLOBAL_QUOTE",
@@ -477,6 +491,9 @@ class StockService:
     ) -> Optional[List[Dict[str, str]]]:
         """Search stocks using Alpha Vantage."""
         try:
+            if not settings.ALPHA_VANTAGE_API_KEY:
+                logger.debug("Alpha Vantage API key not set, skipping search")
+                return None
             async with httpx.AsyncClient() as client:
                 params = {
                     "function": "SYMBOL_SEARCH",

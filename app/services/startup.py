@@ -12,7 +12,16 @@ import redis.asyncio as redis
 from app.config import settings
 import json
 
+from app.celery import trigger_bulk_price_fetch
+
+
 logger = logging.getLogger(__name__)
+
+
+def on_startup_trigger_bulk_price_fetch():
+    """Trigger the Celery task to fetch and cache prices on startup."""
+    logger.info("Triggering Celery background price fetch task...")
+    trigger_bulk_price_fetch()
 
 
 class StartupService:
@@ -111,6 +120,29 @@ class StartupService:
                 self.redis = None
         return self.redis
 
+        """Initialize the price cache on startup."""
+        try:
+            logger.info("🚀 Initializing price cache on startup...")
+
+            # Check if cache already exists and is fresh
+            cached_prices = await bulk_price_service.get_cached_prices()
+            if cached_prices and len(cached_prices) > 100:
+                logger.info("✅ Fresh cache already exists, skipping warm-up")
+                return True
+
+            # Warm the cache
+            success = await bulk_price_service.warm_cache()
+            if success:
+                logger.info("✅ Price cache initialized successfully")
+            else:
+                logger.warning("⚠️ Price cache initialization failed, using fallbacks")
+
+            return success
+
+        except Exception as e:
+            logger.error(f"❌ Cache initialization error: {e}")
+            return False
+
     async def preload_popular_stocks(self) -> bool:
         """
         Preload popular stock prices into Redis cache.
@@ -137,6 +169,8 @@ class StartupService:
                     logger.info(
                         f"✅ Popular stocks cache is recent ({cache_age/60:.1f} minutes old), skipping preload"
                     )
+                    asyncio.create_task(self._refresh_real_prices_background())
+
                     return True
 
             logger.info(
@@ -325,9 +359,7 @@ class StartupService:
             logger.error(f"❌ Error in background price refresh: {e}")
 
     async def preload_all_startup_data(self) -> bool:
-        """
-        Main startup method to preload all necessary data.
-        """
+        """Main startup method to preload all necessary data."""
         logger.info("🚀 Starting application data preload...")
 
         tasks = [

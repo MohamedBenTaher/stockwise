@@ -1,5 +1,6 @@
 import os
-from fastapi import FastAPI, Path, Request, status
+from pathlib import Path
+from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from app.api.holdings import router as holdings_router
@@ -10,8 +11,9 @@ from app.api.stocks import router as stocks_router
 from app.api.charts import router as charts_router
 from app.config import settings
 from app.services.startup import startup_service
+from app.services.bulk_price_service import bulk_price_service
 import logging
-
+from app.celery import trigger_bulk_price_fetch
 
 logger_ = logging.getLogger(__name__)
 
@@ -21,7 +23,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
-    openapi_url="/openapi.json",  # Make sure this is publicly accessible
+    openapi_url="/openapi.json",
 )
 
 # CORS middleware
@@ -36,16 +38,26 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    """Application startup event handler."""
     logger_.info("🚀 Starting StockWise API...")
 
-    # Preload popular stock data into cache
     try:
-        await startup_service.preload_all_startup_data()
-        logger_.info("✅ Startup data preload completed")
+        # Trigger background cache build (non-blocking)
+        logger_.info("Triggering Celery background price fetch...")
+        trigger_bulk_price_fetch()
+
+        # Optionally: preload only very fast, local data here
+        logger_.info("Preloading startup data (fast tasks only)...")
+        preload_success = await startup_service.preload_all_startup_data()
+        if preload_success:
+            logger_.info("✅ Startup data preload completed")
+        else:
+            logger_.warning("⚠️ Startup data preload failed")
+
+        logger_.info("✅ StockWise API started successfully")
+
     except Exception as e:
-        logger_.error(f"❌ Startup data preload failed: {e}")
-        # Don't fail startup if preload fails
+        logger_.error(f"❌ Startup failed: {e}")
+        # Don't fail startup completely, but log the error
 
 
 # Include routers
@@ -78,20 +90,34 @@ async def get_openapi_schema():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"}
+    """Health check endpoint with cache status."""
+    try:
+        # Check if cache is working
+        redis_client = await bulk_price_service.get_redis()
+        cache_status = "connected" if redis_client else "disconnected"
+
+        # Get some basic cache stats
+        cached_prices = await bulk_price_service.get_cached_prices()
+        cache_count = len(cached_prices) if cached_prices else 0
+
+        return {
+            "status": "healthy",
+            "cache_status": cache_status,
+            "cached_prices_count": cache_count,
+            "version": "1.0.0",
+        }
+    except Exception as e:
+        return {
+            "status": "healthy",
+            "cache_status": "error",
+            "cache_error": str(e),
+            "version": "1.0.0",
+        }
 
 
 @app.get("/{full_path:path}", include_in_schema=False, response_model=None)
 async def catch_all(request: Request):
-    """Serve the index.html for frontend routes or static files.
-
-    This handler serves:
-    1. Static files if they exist in the UI directory
-    2. index.html for all other frontend routes (for SPA routing)
-
-    Note: Azure Easy Auth endpoints (/.auth/*) should be handled by Azure App Service
-    before requests reach this handler. If they do reach here, we return a 404.
-    """
+    """Serve the index.html for frontend routes or static files."""
 
     # Azure Easy Auth endpoints should be handled by Azure, not our app
     if request.path_params["full_path"].startswith(".auth/"):

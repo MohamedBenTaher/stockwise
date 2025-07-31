@@ -36,8 +36,8 @@ const Charts: React.FC = () => {
     "3M": 90,
     "6M": 180,
     "1Y": 365,
-    "2Y": 730,
-    ALL: 1095,
+    "2Y": 365, // Cap at 365
+    ALL: 365, // Cap at 365
   };
 
   const days = periodToDays[selectedPeriod as keyof typeof periodToDays] || 365;

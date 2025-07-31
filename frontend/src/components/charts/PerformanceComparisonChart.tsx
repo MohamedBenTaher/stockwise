@@ -35,15 +35,15 @@ interface PerformanceComparisonChartProps {
 const chartConfig = {
   portfolio: {
     label: "Your Portfolio",
-    color: "hsl(var(--chart-1))",
+    color: "hsl(--color-chart-1)",
   },
   sp500: {
     label: "S&P 500",
-    color: "hsl(var(--chart-2))",
+    color: "hsl(--color-chart-2)",
   },
   nasdaq: {
     label: "NASDAQ",
-    color: "hsl(var(--chart-3))",
+    color: "hsl(--color-chart-3)",
   },
 };
 
@@ -141,22 +141,22 @@ export function PerformanceComparisonChart({
             <Line
               dataKey="portfolio"
               type="monotone"
-              stroke="var(--color-portfolio)"
+              stroke="var(--chart-1)"
               strokeWidth={2}
               dot={{
-                fill: "var(--color-portfolio)",
+                fill: "var(--chart-1)",
                 strokeWidth: 2,
               }}
             />
             {showSP500 && (
               <Line
                 dataKey="sp500"
-                type="monotone"
-                stroke="var(--color-sp500)"
+                type="natural"
+                stroke="var(--chart-2)"
                 strokeWidth={2}
                 strokeDasharray="5 5"
                 dot={{
-                  fill: "var(--color-sp500)",
+                  fill: "var(--chart-2)",
                   strokeWidth: 2,
                 }}
               />
@@ -165,11 +165,11 @@ export function PerformanceComparisonChart({
               <Line
                 dataKey="nasdaq"
                 type="monotone"
-                stroke="var(--color-nasdaq)"
+                stroke="var(--chart-3)"
                 strokeWidth={2}
                 strokeDasharray="3 3"
                 dot={{
-                  fill: "var(--color-nasdaq)",
+                  fill: "var(--chart-3)",
                   strokeWidth: 2,
                 }}
               />
