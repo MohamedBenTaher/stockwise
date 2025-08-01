@@ -151,7 +151,7 @@ export function PerformanceComparisonChart({
             {showSP500 && (
               <Line
                 dataKey="sp500"
-                type="natural"
+                type="monotone"
                 stroke="var(--chart-2)"
                 strokeWidth={2}
                 strokeDasharray="5 5"

@@ -123,10 +123,10 @@ export function PortfolioPerformanceChart({
             <Line
               dataKey="value"
               type="monotone"
-              stroke="var(--color-value)"
+              stroke="var(--chart-1)"
               strokeWidth={2}
               dot={{
-                fill: "var(--color-value)",
+                fill: "var(--chart-1)",
               }}
               activeDot={{
                 r: 6,

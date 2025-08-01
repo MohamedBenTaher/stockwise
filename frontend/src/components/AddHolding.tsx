@@ -1,0 +1,98 @@
+import React, { useState } from "react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Select, SelectContent, SelectItem } from "./ui/select";
+import { toast } from "sonner";
+
+interface AddHoldingProps {
+  onSuccess?: () => void;
+}
+
+const assetTypes = [
+  { value: "stock", label: "Stock" },
+  { value: "etf", label: "ETF" },
+  { value: "crypto", label: "Crypto" },
+  { value: "bond", label: "Bond" },
+  { value: "commodity", label: "Commodity" },
+];
+
+export const AddHolding: React.FC<AddHoldingProps> = ({ onSuccess }) => {
+  const [ticker, setTicker] = useState("");
+  const [assetType, setAssetType] = useState("stock");
+  const [quantity, setQuantity] = useState("");
+  const [buyPrice, setBuyPrice] = useState("");
+  const [buyDate, setBuyDate] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      // TODO: Replace with real API call
+      await new Promise((res) => setTimeout(res, 800));
+      toast("Holding added successfully!");
+      setTicker("");
+      setAssetType("stock");
+      setQuantity("");
+      setBuyPrice("");
+      setBuyDate("");
+      onSuccess?.();
+    } catch (err) {
+      toast("Failed to add holding");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="w-full max-w-md mx-auto bg-white rounded-lg shadow p-6 space-y-4"
+    >
+      <h2 className="text-xl font-bold mb-2">Add Holding</h2>
+      <Input
+        placeholder="Ticker (e.g., AAPL)"
+        value={ticker}
+        onChange={(e) => setTicker(e.target.value.toUpperCase())}
+        required
+      />
+      <Select value={assetType} onValueChange={setAssetType}>
+        <SelectContent>
+          {assetTypes.map((type) => (
+            <SelectItem key={type.value} value={type.value}>
+              {type.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Input
+        type="number"
+        placeholder="Quantity"
+        value={quantity}
+        onChange={(e) => setQuantity(e.target.value)}
+        min={0.01}
+        step={0.01}
+        required
+      />
+      <Input
+        type="number"
+        placeholder="Buy Price"
+        value={buyPrice}
+        onChange={(e) => setBuyPrice(e.target.value)}
+        min={0.01}
+        step={0.01}
+        required
+      />
+      <Input
+        type="date"
+        value={buyDate}
+        onChange={(e) => setBuyDate(e.target.value)}
+        required
+      />
+      <Button type="submit" size="lg" className="w-full" disabled={loading}>
+        {loading ? "Adding..." : "Add Holding"}
+      </Button>
+    </form>
+  );
+};
