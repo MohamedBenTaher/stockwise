@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Select, SelectContent, SelectItem } from "./ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import { toast } from "sonner";
+import { useCreateHolding } from "../hooks/useHoldings";
 
 interface AddHoldingProps {
   onSuccess?: () => void;
@@ -18,28 +25,47 @@ const assetTypes = [
 
 export const AddHolding: React.FC<AddHoldingProps> = ({ onSuccess }) => {
   const [ticker, setTicker] = useState("");
-  const [assetType, setAssetType] = useState("stock");
+  const [assetType, setAssetType] = useState<
+    "stock" | "etf" | "crypto" | "bond" | "commodity"
+  >("stock");
   const [quantity, setQuantity] = useState("");
   const [buyPrice, setBuyPrice] = useState("");
   const [buyDate, setBuyDate] = useState("");
 
+  const createHoldingMutation = useCreateHolding();
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+
+    if (!ticker || !quantity || !buyPrice || !buyDate) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
     try {
-      // TODO: Replace with real API call
-      await new Promise((res) => setTimeout(res, 800));
-      toast("Holding added successfully!");
+      setLoading(true);
+      await createHoldingMutation.mutateAsync({
+        ticker: ticker.toUpperCase(),
+        asset_type: assetType,
+        quantity: parseFloat(quantity),
+        buy_price: parseFloat(buyPrice),
+        buy_date: buyDate,
+      });
+
+      // Reset form
       setTicker("");
       setAssetType("stock");
       setQuantity("");
       setBuyPrice("");
       setBuyDate("");
+
+      // Call success callback
       onSuccess?.();
-    } catch (err) {
-      toast("Failed to add holding");
+      toast.success("Holding added successfully!");
+    } catch (error) {
+      console.error("Failed to add holding:", error);
+      toast.error("Failed to add holding. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -57,7 +83,13 @@ export const AddHolding: React.FC<AddHoldingProps> = ({ onSuccess }) => {
         onChange={(e) => setTicker(e.target.value.toUpperCase())}
         required
       />
-      <Select value={assetType} onValueChange={setAssetType}>
+      <Select
+        value={assetType}
+        onValueChange={(value) => setAssetType(value as typeof assetType)}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Select asset type" />
+        </SelectTrigger>
         <SelectContent>
           {assetTypes.map((type) => (
             <SelectItem key={type.value} value={type.value}>

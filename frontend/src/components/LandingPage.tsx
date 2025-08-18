@@ -1,7 +1,14 @@
 import React from "react";
 import { Button } from "./ui/button";
+import { useNavigate } from "react-router-dom";
 
-export const LandingPage: React.FC<{ onStart: () => void }> = ({ onStart }) => {
+export const LandingPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    navigate("/onboarding");
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] p-8 text-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <img
@@ -17,7 +24,11 @@ export const LandingPage: React.FC<{ onStart: () => void }> = ({ onStart }) => {
         risk, and get actionable AI-powered suggestions. Start your journey to
         better investing today.
       </p>
-      <Button size="lg" onClick={onStart} className="px-8 py-3 text-lg">
+      <Button
+        size="lg"
+        onClick={handleGetStarted}
+        className="px-8 py-3 text-lg"
+      >
         Get Started
       </Button>
     </div>

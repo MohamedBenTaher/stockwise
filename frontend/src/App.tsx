@@ -2,7 +2,6 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  useNavigate,
   Navigate,
 } from "react-router-dom";
 import { useState } from "react";
@@ -15,22 +14,21 @@ import Charts from "./pages/Charts";
 import AuthForm from "./components/Auth_new";
 import { Layout } from "./components/Layout";
 import { Toaster } from "./components/ui/sonner";
-import { Onboarding } from "./components/Onboarding";
-import { AddHoldingOnboarding } from "./components/AddHoldingOnboarding";
+import { OnboardingFlow } from "./components/OnboardingFlow";
 import { LandingPage } from "./components/LandingPage";
 import "./App.css";
 
 function App() {
-  // This can be replaced with a real onboarding check (e.g. from user profile or localStorage)
-  const [onboardingStep, setOnboardingStep] = useState<0 | 1 | 2 | 3>(0);
+  // Check if user has completed onboarding (this would typically come from user profile or localStorage)
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
+    return localStorage.getItem("stockwise_onboarding_completed") === "true";
+  });
 
-  // 0 = landing, 1 = onboarding, 2 = add holding, 3 = done
-  const handleNext = () =>
-    setOnboardingStep((step) => {
-      if (step === 0) return 1;
-      if (step === 1) return 2;
-      return 3;
-    });
+  const handleOnboardingComplete = () => {
+    setHasCompletedOnboarding(true);
+    // Save to localStorage
+    localStorage.setItem("stockwise_onboarding_completed", "true");
+  };
 
   return (
     <Router>
@@ -40,10 +38,8 @@ function App() {
           <Route
             path="/onboarding"
             element={
-              onboardingStep === 1 ? (
-                <Onboarding onNext={handleNext} />
-              ) : onboardingStep === 2 ? (
-                <AddHoldingOnboarding onNext={handleNext} />
+              !hasCompletedOnboarding ? (
+                <OnboardingFlow onComplete={handleOnboardingComplete} />
               ) : (
                 <Navigate to="/" replace />
               )
@@ -51,17 +47,9 @@ function App() {
           />
           <Route
             path="/"
-            element={
-              onboardingStep === 0 ? (
-                <LandingPage onStart={handleNext} />
-              ) : onboardingStep < 3 ? (
-                <Navigate to="/onboarding" replace />
-              ) : (
-                <Layout />
-              )
-            }
+            element={!hasCompletedOnboarding ? <LandingPage /> : <Layout />}
           >
-            {onboardingStep === 3 && (
+            {hasCompletedOnboarding && (
               <>
                 <Route index element={<Dashboard />} />
                 <Route path="dashboard" element={<Dashboard />} />

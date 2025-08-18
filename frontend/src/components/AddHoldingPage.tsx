@@ -117,7 +117,6 @@ export const AddHoldingPage: React.FC = () => {
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="space-y-6"
                 >
-                  {/* Stock Ticker */}
                   <FormField
                     control={form.control}
                     name="ticker"
