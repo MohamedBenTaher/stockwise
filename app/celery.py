@@ -30,16 +30,27 @@ def fetch_and_cache_bulk_prices_task():
     """Celery task to fetch and cache all prices in Redis."""
     from app.services.bulk_price_service import bulk_price_service
     import asyncio
+    import logging
 
-    logger = __import__("logging").getLogger("celery")
+    logger = logging.getLogger("celery")
     try:
+        # Create a new event loop for this task
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
+
+        # Run the async functions
         prices = loop.run_until_complete(bulk_price_service.fetch_bulk_prices())
         loop.run_until_complete(bulk_price_service.cache_bulk_prices(prices))
+
         logger.info(f"[Celery] Bulk prices fetched and cached: {len(prices)} assets.")
+        return {"status": "success", "count": len(prices)}
     except Exception as e:
         logger.error(f"[Celery] Failed to fetch/cache bulk prices: {e}")
+        return {"status": "error", "error": str(e)}
+    finally:
+        # Clean up the event loop
+        if "loop" in locals():
+            loop.close()
 
 
 # Utility to trigger the task from FastAPI or startup

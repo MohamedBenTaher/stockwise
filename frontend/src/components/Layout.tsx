@@ -1,5 +1,5 @@
 import React from "react";
-import { Outlet, Navigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { useUser } from "../hooks/useAuth";
 import { Loader2 } from "lucide-react";
 import { SidebarInset, SidebarProvider } from "./ui/sidebar";
@@ -7,12 +7,11 @@ import { AppSidebar } from "./app-sidebar";
 import { SiteHeader } from "./site-header";
 
 export const Layout: React.FC = () => {
-  const { data: user, isLoading, error } = useUser();
+  const { data: user, isLoading } = useUser();
 
   // Debug logging
   console.log("Layout: user =", user);
   console.log("Layout: isLoading =", isLoading);
-  console.log("Layout: error =", error);
 
   // Show loading spinner while checking authentication
   if (isLoading) {
@@ -26,16 +25,8 @@ export const Layout: React.FC = () => {
     );
   }
 
-  // Redirect to auth if no user or authentication error
-  if (!user || error) {
-    console.log(
-      "Layout: Redirecting to auth because user =",
-      user,
-      "error =",
-      error
-    );
-    return <Navigate to="/auth" replace />;
-  }
+  // Note: We removed the redirect logic here since App.tsx now handles authentication
+  // The Layout component should only render if the user is authenticated
 
   return (
     <div className="flex h-screen bg-gray-50">

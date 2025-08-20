@@ -15,10 +15,18 @@ import AuthForm from "./components/Auth_new";
 import { Layout } from "./components/Layout";
 import { Toaster } from "./components/ui/sonner";
 import { OnboardingFlow } from "./components/OnboardingFlow";
-import { LandingPage } from "./components/LandingPage";
+import LandingPage from "./components/LandingPage";
+import { useUser } from "./hooks/useAuth";
+import { Loader2 } from "lucide-react";
 import "./App.css";
 
 function App() {
+  // TEMPORARY: Comment out auth to test landing page
+  // const { data: user, isLoading, error } = useUser();
+
+  // Debug logging
+  console.log("App: TESTING - Auth disabled, showing landing page");
+
   // Check if user has completed onboarding (this would typically come from user profile or localStorage)
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
     return localStorage.getItem("stockwise_onboarding_completed") === "true";
@@ -30,42 +38,18 @@ function App() {
     localStorage.setItem("stockwise_onboarding_completed", "true");
   };
 
+  // TEMPORARY: Always show landing page for testing
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
+      <div className="w-full min-h-screen">
         <Routes>
           <Route path="/auth" element={<AuthForm />} />
-          <Route
-            path="/onboarding"
-            element={
-              !hasCompletedOnboarding ? (
-                <OnboardingFlow onComplete={handleOnboardingComplete} />
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
-          />
-          <Route
-            path="/"
-            element={!hasCompletedOnboarding ? <LandingPage /> : <Layout />}
-          >
-            {hasCompletedOnboarding && (
-              <>
-                <Route index element={<Dashboard />} />
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="holdings" element={<Holdings />} />
-                <Route path="holdings/add" element={<AddHoldingPage />} />
-                <Route path="insights" element={<Insights />} />
-                <Route path="risk" element={<RiskAnalysis />} />
-                <Route path="charts" element={<Charts />} />
-              </>
-            )}
-          </Route>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <Toaster />
       </div>
     </Router>
   );
 }
-
 export default App;
