@@ -2,57 +2,57 @@ const testimonials = [
   {
     quote:
       "StockWise's AI insights helped me identified that I was overexposed to tech stocks. The diversification recommendations led to a 15% improvement in my risk-adjusted returns.",
-    name: "Michael Rodriguez",
+    name: "Annette Black",
     company: "Individual Investor",
-    avatar: "/images/avatars/annette-black.svg",
+    avatar: "/images/avatars/annette-black.png",
     type: "large-teal",
   },
   {
     quote:
       "The real-time tracking and alerts saved me from a major loss during the market volatility. I got notified instantly when my portfolio risk exceeded my comfort zone.",
-    name: "Jennifer Park",
+    name: "Darlene Robertson",
     company: "Financial Advisor",
-    avatar: "/images/avatars/dianne-russell.svg",
+    avatar: "/images/avatars/dianne-russell.png",
     type: "small-dark",
   },
   {
     quote:
       "As a beginner investor, StockWise made portfolio management approachable. The AI explains everything in simple terms while providing sophisticated analysis.",
-    name: "David Thompson",
+    name: "Cameron Williamson",
     company: "Software Engineer",
-    avatar: "/images/avatars/cameron-williamson.svg",
+    avatar: "/images/avatars/cameron-williamson.png",
     type: "small-dark",
   },
   {
     quote:
       "The brokerage integration is seamless. All my accounts sync automatically, and I get a unified view of my entire investment portfolio in one dashboard.",
-    name: "Lisa Chang",
+    name: "Robert Fox",
     company: "Investment Manager",
-    avatar: "/images/avatars/robert-fox.svg",
+    avatar: "/images/avatars/robert-fox.png",
     type: "small-dark",
   },
   {
     quote:
       "The predictive analytics feature warned me about sector rotation before it happened. I was able to rebalance my portfolio and avoid significant losses.",
-    name: "Robert Kim",
+    name: "Darlene Robertson",
     company: "Wealth Manager",
-    avatar: "/images/avatars/darlene-robertson.svg",
+    avatar: "/images/avatars/darlene-robertson.png",
     type: "small-dark",
   },
   {
     quote:
       "StockWise's risk assessment tools are incredibly detailed yet easy to understand. The geographic and sector exposure analysis helped me build a truly diversified portfolio.",
-    name: "Amanda Foster",
+    name: "Cody Fisher",
     company: "Portfolio Analyst",
-    avatar: "/images/avatars/cody-fisher.svg",
+    avatar: "/images/avatars/cody-fisher.png",
     type: "small-dark",
   },
   {
     quote:
       "The mobile app keeps me connected to my investments wherever I am. Push notifications for significant market moves and portfolio changes are invaluable for active management.",
-    name: "James Wilson",
+    name: "John Doe",
     company: "Day Trader",
-    avatar: "/images/avatars/albert-flores.svg",
+    avatar: "/images/avatars/albert-flores.png",
     type: "large-light",
   },
 ];

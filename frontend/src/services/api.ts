@@ -36,7 +36,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("stockwise_token");
-      window.location.href = "/auth";
+      window.location.href = "/";
     }
     return Promise.reject(error);
   }

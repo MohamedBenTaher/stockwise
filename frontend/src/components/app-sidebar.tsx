@@ -48,22 +48,22 @@ const data = {
     },
     {
       title: "Holdings",
-      url: "/holdings",
+      url: "/dashboard/holdings",
       icon: IconListDetails,
     },
     {
       title: "Insights",
-      url: "/insights",
+      url: "/dashboard/insights",
       icon: IconChartBar,
     },
     {
       title: "Charts",
-      url: "/charts",
+      url: "/dashboard/charts",
       icon: IconTrendingUp,
     },
     {
       title: "Risk Analysis",
-      url: "/risk",
+      url: "/dashboard/risk",
       icon: IconFolder,
     },
     {

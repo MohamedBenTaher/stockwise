@@ -25,9 +25,6 @@ export const Layout: React.FC = () => {
     );
   }
 
-  // Note: We removed the redirect logic here since App.tsx now handles authentication
-  // The Layout component should only render if the user is authenticated
-
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}

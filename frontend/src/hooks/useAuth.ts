@@ -100,14 +100,14 @@ export const useLogout = () => {
     onSuccess: () => {
       setAuthenticationState(false);
       queryClient.clear();
-      // Redirect to auth page
+      // Always redirect to landing page
       window.location.href = "/";
     },
     onError: () => {
       // Even if logout fails on the server, clear local state
       setAuthenticationState(false);
       queryClient.clear();
-      window.location.href = "/auth";
+      window.location.href = "/";
     },
   });
 };

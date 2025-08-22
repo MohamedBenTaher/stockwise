@@ -111,9 +111,9 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // Handle authentication errors
       localStorage.removeItem("stockwise_authenticated");
-      if (window.location.pathname !== "/auth") {
-        console.warn("🔐 Authentication failed, redirecting to login");
-        window.location.href = "/auth";
+      if (window.location.pathname !== "/") {
+        console.warn("🔐 Authentication failed, redirecting to landing page");
+        window.location.href = "/";
       }
     }
 

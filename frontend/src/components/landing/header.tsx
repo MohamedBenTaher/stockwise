@@ -47,7 +47,7 @@ export function Header() {
             {navItems.map((item) => (
               <Link
                 key={item.name}
-                href={item.href}
+                to={item.href}
                 onClick={(e) => handleScroll(e, item.href)}
                 className="text-[#888888] hover:text-foreground px-4 py-2 rounded-full font-medium transition-colors"
               >
@@ -57,7 +57,7 @@ export function Header() {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/login" className="hidden md:block">
+          <Link to="/auth" className="hidden md:block">
             <Button
               variant="ghost"
               className="text-foreground hover:bg-accent px-4 py-2 rounded-full font-medium"
@@ -65,7 +65,7 @@ export function Header() {
               Sign In
             </Button>
           </Link>
-          <Link href="/signup" className="hidden md:block">
+          <Link to="/signup" className="hidden md:block">
             <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-2 rounded-full font-medium shadow-sm">
               Start Free Trial
             </Button>
@@ -90,7 +90,7 @@ export function Header() {
                 {navItems.map((item) => (
                   <Link
                     key={item.name}
-                    href={item.href}
+                    to={item.href}
                     onClick={(e) => handleScroll(e, item.href)}
                     className="text-[#888888] hover:text-foreground justify-start text-lg py-2"
                   >
@@ -98,7 +98,7 @@ export function Header() {
                   </Link>
                 ))}
                 <div className="flex flex-col gap-2 mt-4">
-                  <Link href="/login" className="w-full">
+                  <Link to="/login" className="w-full">
                     <Button
                       variant="ghost"
                       className="w-full text-foreground hover:bg-accent px-4 py-2 rounded-full font-medium"
@@ -106,7 +106,7 @@ export function Header() {
                       Sign In
                     </Button>
                   </Link>
-                  <Link href="/signup" className="w-full">
+                  <Link to="/auth" className="w-full">
                     <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-2 rounded-full font-medium shadow-sm">
                       Start Free Trial
                     </Button>
