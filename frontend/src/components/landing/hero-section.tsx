@@ -263,102 +263,102 @@ export function HeroSection() {
                   />
                 </React.Fragment>
               ))}
-              {/* Specific Rectangles with fill */}
+              {/* Specific Rectangles with vibrant fills */}
               <rect
                 x="699.711"
                 y="81"
                 width="36"
                 height="36"
-                fill="hsl(var(--foreground))"
-                fillOpacity="0.08"
+                fill="#6366f1"
+                fillOpacity="0.12"
               />
               <rect
                 x="195.711"
                 y="153"
                 width="36"
                 height="36"
-                fill="hsl(var(--foreground))"
-                fillOpacity="0.09"
+                fill="#8b5cf6"
+                fillOpacity="0.15"
               />
               <rect
                 x="1023.71"
                 y="153"
                 width="36"
                 height="36"
-                fill="hsl(var(--foreground))"
-                fillOpacity="0.09"
+                fill="#06b6d4"
+                fillOpacity="0.12"
               />
               <rect
                 x="123.711"
                 y="225"
                 width="36"
                 height="36"
-                fill="hsl(var(--foreground))"
-                fillOpacity="0.09"
+                fill="#10b981"
+                fillOpacity="0.14"
               />
               <rect
                 x="1095.71"
                 y="225"
                 width="36"
                 height="36"
-                fill="hsl(var(--foreground))"
-                fillOpacity="0.09"
+                fill="#f59e0b"
+                fillOpacity="0.13"
               />
               <rect
                 x="951.711"
                 y="297"
                 width="36"
                 height="36"
-                fill="hsl(var(--foreground))"
-                fillOpacity="0.09"
+                fill="#8b5cf6"
+                fillOpacity="0.11"
               />
               <rect
                 x="231.711"
                 y="333"
                 width="36"
                 height="36"
-                fill="hsl(var(--foreground))"
-                fillOpacity="0.07"
+                fill="#06b6d4"
+                fillOpacity="0.10"
               />
               <rect
                 x="303.711"
                 y="405"
                 width="36"
                 height="36"
-                fill="hsl(var(--foreground))"
-                fillOpacity="0.07"
+                fill="#6366f1"
+                fillOpacity="0.09"
               />
               <rect
                 x="87.7109"
                 y="405"
                 width="36"
                 height="36"
-                fill="hsl(var(--foreground))"
-                fillOpacity="0.09"
+                fill="#10b981"
+                fillOpacity="0.13"
               />
               <rect
                 x="519.711"
                 y="405"
                 width="36"
                 height="36"
-                fill="hsl(var(--foreground))"
-                fillOpacity="0.08"
+                fill="#f59e0b"
+                fillOpacity="0.11"
               />
               <rect
                 x="771.711"
                 y="405"
                 width="36"
                 height="36"
-                fill="hsl(var(--foreground))"
-                fillOpacity="0.09"
+                fill="#8b5cf6"
+                fillOpacity="0.12"
               />
               <rect
                 x="591.711"
                 y="477"
                 width="36"
                 height="36"
-                fill="hsl(var(--foreground))"
-                fillOpacity="0.07"
+                fill="#06b6d4"
+                fillOpacity="0.10"
               />
             </g>
 
@@ -513,9 +513,10 @@ export function HeroSection() {
               y2="1248.85"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="hsl(var(--foreground))" />
-              <stop offset="0.578125" stopColor="hsl(var(--primary-light))" />
-              <stop offset="1" stopColor="hsl(var(--primary))" />
+              <stop stopColor="#6366f1" stopOpacity="0.1" />
+              <stop offset="0.3" stopColor="#8b5cf6" stopOpacity="0.2" />
+              <stop offset="0.7" stopColor="#06b6d4" stopOpacity="0.15" />
+              <stop offset="1" stopColor="#10b981" stopOpacity="0.1" />
             </linearGradient>
             <linearGradient
               id="paint2_linear_186_1134"
@@ -525,9 +526,10 @@ export function HeroSection() {
               y2="1184.85"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="hsl(var(--foreground))" />
-              <stop offset="0.578125" stopColor="hsl(var(--primary-light))" />
-              <stop offset="1" stopColor="hsl(var(--primary))" />
+              <stop stopColor="#8b5cf6" stopOpacity="0.12" />
+              <stop offset="0.4" stopColor="#06b6d4" stopOpacity="0.18" />
+              <stop offset="0.8" stopColor="#10b981" stopOpacity="0.12" />
+              <stop offset="1" stopColor="#f59e0b" stopOpacity="0.08" />
             </linearGradient>
             <linearGradient
               id="paint3_linear_186_1134"
@@ -537,9 +539,9 @@ export function HeroSection() {
               y2="1104.85"
               gradientUnits="userSpaceOnUse"
             >
-              <stop stopColor="hsl(var(--foreground))" />
-              <stop offset="0.578125" stopColor="hsl(var(--primary-light))" />
-              <stop offset="1" stopColor="hsl(var(--primary))" />
+              <stop stopColor="#06b6d4" stopOpacity="0.15" />
+              <stop offset="0.5" stopColor="#10b981" stopOpacity="0.2" />
+              <stop offset="1" stopColor="#6366f1" stopOpacity="0.1" />
             </linearGradient>
             <radialGradient
               id="paint4_radial_186_1134"
@@ -549,9 +551,10 @@ export function HeroSection() {
               gradientUnits="userSpaceOnUse"
               gradientTransform="translate(989.13 557.24) rotate(47.9516) scale(466.313 471.424)"
             >
-              <stop stopColor="hsl(var(--foreground))" />
-              <stop offset="0.157789" stopColor="hsl(var(--primary-light))" />
-              <stop offset="1" stopColor="hsl(var(--primary))" />
+              <stop stopColor="#6366f1" stopOpacity="0.2" />
+              <stop offset="0.3" stopColor="#8b5cf6" stopOpacity="0.15" />
+              <stop offset="0.7" stopColor="#06b6d4" stopOpacity="0.1" />
+              <stop offset="1" stopColor="#10b981" stopOpacity="0.05" />
             </radialGradient>
             <clipPath id="clip0_186_1134">
               <rect
@@ -582,12 +585,12 @@ export function HeroSection() {
       </div>
 
       <div className="relative z-10 flex flex-col sm:flex-row gap-4 items-center">
-        <Link href="/signup">
+        <Link to="/signup">
           <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-3 rounded-full font-medium text-base shadow-lg ring-1 ring-white/10">
             Start Free Trial
           </Button>
         </Link>
-        <Link href="/demo">
+        <Link to="/demo">
           <Button
             variant="outline"
             className="border-border text-foreground hover:bg-accent px-8 py-3 rounded-full font-medium text-base bg-transparent"

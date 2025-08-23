@@ -32,10 +32,8 @@ export const Insights: React.FC = () => {
     refetch: refetchInsights,
   } = useLatestInsights();
 
-  const {
-    data: portfolioSummary,
-    isLoading: portfolioLoading,
-  } = usePortfolioSummary();
+  const { data: portfolioSummary, isLoading: portfolioLoading } =
+    usePortfolioSummary();
 
   const generateInsightsMutation = useGenerateInsights();
 
@@ -99,7 +97,9 @@ export const Insights: React.FC = () => {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">AI Insights</h1>
             <p className="text-gray-600">
-              {isGenerating ? "Generating insights..." : "Loading portfolio insights"}
+              {isGenerating
+                ? "Generating insights..."
+                : "Loading portfolio insights"}
             </p>
           </div>
         </div>
@@ -108,7 +108,9 @@ export const Insights: React.FC = () => {
           <div className="flex items-center space-x-2">
             <Loader2 className="h-6 w-6 animate-spin" />
             <span>
-              {isGenerating ? "Analyzing your portfolio..." : "Loading insights..."}
+              {isGenerating
+                ? "Analyzing your portfolio..."
+                : "Loading insights..."}
             </span>
           </div>
         </div>
@@ -161,7 +163,8 @@ export const Insights: React.FC = () => {
               No Portfolio Data
             </h3>
             <p className="text-gray-600 mb-6">
-              Add some holdings to your portfolio to get AI-powered insights and analysis.
+              Add some holdings to your portfolio to get AI-powered insights and
+              analysis.
             </p>
             <Button onClick={() => (window.location.href = "/holdings/add")}>
               Add Holdings
@@ -190,7 +193,9 @@ export const Insights: React.FC = () => {
           ) : (
             <RefreshCw className="h-4 w-4" />
           )}
-          <span>{isGenerating ? "Generating..." : "Generate New Insights"}</span>
+          <span>
+            {isGenerating ? "Generating..." : "Generate New Insights"}
+          </span>
         </Button>
       </div>
 
@@ -200,7 +205,9 @@ export const Insights: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                {getRiskIcon(insights.insight?.risk_summary?.overall_risk_level || "")}
+                {getRiskIcon(
+                  insights.insight?.risk_summary?.overall_risk_level || ""
+                )}
                 <span className="ml-2">Risk Analysis</span>
               </CardTitle>
               <CardDescription>
@@ -210,18 +217,23 @@ export const Insights: React.FC = () => {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Risk Level</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    Risk Level
+                  </p>
                   <Badge
                     variant={getRiskLevelVariant(
                       insights.insight?.risk_summary?.overall_risk_level || ""
                     )}
                     className="mt-1"
                   >
-                    {insights.insight?.risk_summary?.overall_risk_level?.toUpperCase() || "UNKNOWN"}
+                    {insights.insight?.risk_summary?.overall_risk_level?.toUpperCase() ||
+                      "UNKNOWN"}
                   </Badge>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">Risk Score</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    Risk Score
+                  </p>
                   <p
                     className={`text-2xl font-bold ${getRiskColor(
                       insights.insight?.risk_summary?.overall_risk_level || ""
@@ -239,23 +251,29 @@ export const Insights: React.FC = () => {
                 />
               )}
 
-              {insights.insight?.risk_summary?.main_concerns && 
-               insights.insight.risk_summary.main_concerns.length > 0 && (
-                <div>
-                  <p className="text-sm font-medium text-gray-900 mb-2">Main Concerns</p>
-                  <div className="space-y-2">
-                    {insights.insight.risk_summary.main_concerns.map((concern, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center p-2 bg-yellow-50 rounded-lg border border-yellow-200"
-                      >
-                        <AlertTriangle className="h-4 w-4 text-yellow-600 mr-2" />
-                        <span className="text-sm text-yellow-800">{concern}</span>
-                      </div>
-                    ))}
+              {insights.insight?.risk_summary?.main_concerns &&
+                insights.insight.risk_summary.main_concerns.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 mb-2">
+                      Main Concerns
+                    </p>
+                    <div className="space-y-2">
+                      {insights.insight.risk_summary.main_concerns.map(
+                        (concern, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center p-2 bg-yellow-50 rounded-lg border border-yellow-200"
+                          >
+                            <AlertTriangle className="h-4 w-4 text-yellow-600 mr-2" />
+                            <span className="text-sm text-yellow-800">
+                              {concern}
+                            </span>
+                          </div>
+                        )
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </CardContent>
           </Card>
 
@@ -271,23 +289,27 @@ export const Insights: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {insights.insight?.key_recommendations && 
-               insights.insight.key_recommendations.length > 0 ? (
+              {insights.insight?.key_recommendations &&
+              insights.insight.key_recommendations.length > 0 ? (
                 <div className="space-y-3">
-                  {insights.insight.key_recommendations.map((recommendation, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start p-4 bg-blue-50 rounded-lg border border-blue-200"
-                    >
-                      <Target className="h-5 w-5 text-blue-600 mr-3 mt-0.5" />
-                      <div>
-                        <p className="text-sm text-blue-900 font-medium">
-                          Recommendation {index + 1}
-                        </p>
-                        <p className="text-sm text-blue-800 mt-1">{recommendation}</p>
+                  {insights.insight.key_recommendations.map(
+                    (recommendation, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start p-4 bg-blue-50 rounded-lg border border-blue-200"
+                      >
+                        <Target className="h-5 w-5 text-blue-600 mr-3 mt-0.5" />
+                        <div>
+                          <p className="text-sm text-blue-900 font-medium">
+                            Recommendation {index + 1}
+                          </p>
+                          <p className="text-sm text-blue-800 mt-1">
+                            {recommendation}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
               ) : (
                 <p className="text-gray-600 text-center py-8">
@@ -298,110 +320,147 @@ export const Insights: React.FC = () => {
           </Card>
 
           {/* Concentration Alerts */}
-          {insights.insight?.concentration_alerts && 
-           insights.insight.concentration_alerts.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <AlertTriangle className="h-5 w-5 mr-2 text-orange-600" />
-                  Concentration Alerts
-                </CardTitle>
-                <CardDescription>
-                  Areas where your portfolio may be overconcentrated
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {insights.insight.concentration_alerts.map((alert, index) => (
-                    <div
-                      key={index}
-                      className="p-4 border rounded-lg bg-orange-50 border-orange-200"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <p className="font-medium text-orange-900">
-                            {alert.type?.replace('_', ' ').toUpperCase()}: {alert.asset_name}
+          {insights.insight?.concentration_alerts &&
+            insights.insight.concentration_alerts.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <AlertTriangle className="h-5 w-5 mr-2 text-orange-600" />
+                    Concentration Alerts
+                  </CardTitle>
+                  <CardDescription>
+                    Areas where your portfolio may be overconcentrated
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {insights.insight.concentration_alerts.map(
+                      (alert, index) => (
+                        <div
+                          key={index}
+                          className="p-4 border rounded-lg bg-orange-50 border-orange-200"
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <div>
+                              <p className="font-medium text-orange-900">
+                                {alert.type?.replace("_", " ").toUpperCase()}:{" "}
+                                {alert.asset_name}
+                              </p>
+                              <Badge
+                                variant={getRiskLevelVariant(
+                                  alert.risk_level || ""
+                                )}
+                                className="mt-1"
+                              >
+                                {alert.risk_level?.toUpperCase() || "UNKNOWN"}{" "}
+                                RISK
+                              </Badge>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-2xl font-bold text-orange-900">
+                                {alert.concentration_percentage?.toFixed(1) ||
+                                  0}
+                                %
+                              </p>
+                              <p className="text-xs text-orange-700">
+                                of portfolio
+                              </p>
+                            </div>
+                          </div>
+                          <p className="text-sm text-orange-800">
+                            {alert.recommendation}
                           </p>
-                          <Badge
-                            variant={getRiskLevelVariant(alert.risk_level || "")}
-                            className="mt-1"
-                          >
-                            {alert.risk_level?.toUpperCase() || "UNKNOWN"} RISK
-                          </Badge>
                         </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-orange-900">
-                            {alert.concentration_percentage?.toFixed(1) || 0}%
-                          </p>
-                          <p className="text-xs text-orange-700">of portfolio</p>
-                        </div>
-                      </div>
-                      <p className="text-sm text-orange-800">{alert.recommendation}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                      )
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
           {/* Diversification Suggestions */}
-          {insights.insight?.diversification_suggestions && 
-           insights.insight.diversification_suggestions.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <TrendingUp className="h-5 w-5 mr-2 text-green-600" />
-                  Diversification Opportunities
-                </CardTitle>
-                <CardDescription>
-                  Suggestions to improve portfolio diversification
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {insights.insight.diversification_suggestions.map((suggestion, index) => (
-                    <div
-                      key={index}
-                      className="p-4 border rounded-lg bg-green-50 border-green-200"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <p className="font-medium text-green-900">
-                            {suggestion.type?.replace('_', ' ').toUpperCase()} Diversification
+          {insights.insight?.diversification_suggestions &&
+            insights.insight.diversification_suggestions.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <TrendingUp className="h-5 w-5 mr-2 text-green-600" />
+                    Diversification Opportunities
+                  </CardTitle>
+                  <CardDescription>
+                    Suggestions to improve portfolio diversification
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {insights.insight.diversification_suggestions.map(
+                      (suggestion, index) => (
+                        <div
+                          key={index}
+                          className="p-4 border rounded-lg bg-green-50 border-green-200"
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <div>
+                              <p className="font-medium text-green-900">
+                                {suggestion.type
+                                  ?.replace("_", " ")
+                                  .toUpperCase()}{" "}
+                                Diversification
+                              </p>
+                              <Badge
+                                variant={
+                                  suggestion.priority === "high"
+                                    ? "destructive"
+                                    : suggestion.priority === "medium"
+                                    ? "outline"
+                                    : "default"
+                                }
+                                className="mt-1"
+                              >
+                                {suggestion.priority?.toUpperCase() || "NORMAL"}{" "}
+                                PRIORITY
+                              </Badge>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm text-green-700">
+                                Current:{" "}
+                                {suggestion.current_exposure?.toFixed(1) || 0}%
+                              </p>
+                              <p className="text-sm text-green-700">
+                                Recommended:{" "}
+                                {suggestion.recommended_exposure?.toFixed(1) ||
+                                  0}
+                                %
+                              </p>
+                            </div>
+                          </div>
+                          <p className="text-sm text-green-800">
+                            {suggestion.suggestion}
                           </p>
-                          <Badge
-                            variant={suggestion.priority === "high" ? "destructive" : 
-                                   suggestion.priority === "medium" ? "outline" : "default"}
-                            className="mt-1"
-                          >
-                            {suggestion.priority?.toUpperCase() || "NORMAL"} PRIORITY
-                          </Badge>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm text-green-700">
-                            Current: {suggestion.current_exposure?.toFixed(1) || 0}%
-                          </p>
-                          <p className="text-sm text-green-700">
-                            Recommended: {suggestion.recommended_exposure?.toFixed(1) || 0}%
-                          </p>
-                        </div>
-                      </div>
-                      <p className="text-sm text-green-800">{suggestion.suggestion}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                      )
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
           {/* Insight Metadata */}
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between text-sm text-gray-500">
                 <div>
-                  <p>Generated: {new Date(insights.insight?.generated_at || "").toLocaleString()}</p>
+                  <p>
+                    Generated:{" "}
+                    {new Date(
+                      insights.insight?.generated_at || ""
+                    ).toLocaleString()}
+                  </p>
                   {insights.insight?.confidence_score && (
-                    <p>Confidence: {(insights.insight.confidence_score * 100).toFixed(1)}%</p>
+                    <p>
+                      Confidence:{" "}
+                      {(insights.insight.confidence_score * 100).toFixed(1)}%
+                    </p>
                   )}
                 </div>
                 <div className="text-right">
@@ -422,7 +481,8 @@ export const Insights: React.FC = () => {
               No Insights Available
             </h3>
             <p className="text-gray-600 mb-6">
-              Generate AI-powered insights for your portfolio to get personalized recommendations.
+              Generate AI-powered insights for your portfolio to get
+              personalized recommendations.
             </p>
             <Button
               onClick={handleGenerateInsights}
@@ -434,7 +494,9 @@ export const Insights: React.FC = () => {
               ) : (
                 <Lightbulb className="h-4 w-4" />
               )}
-              <span>{isGenerating ? "Generating..." : "Generate Insights"}</span>
+              <span>
+                {isGenerating ? "Generating..." : "Generate Insights"}
+              </span>
             </Button>
           </CardContent>
         </Card>

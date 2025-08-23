@@ -18,6 +18,7 @@ import { OnboardingFlow } from "./components/OnboardingFlow";
 import LandingPage from "./components/LandingPage";
 import { useUser } from "./hooks/useAuth";
 import { Loader2 } from "lucide-react";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import "./App.css";
 
 function App() {
@@ -43,34 +44,36 @@ function App() {
   }
 
   return (
-    <Router>
-      <div className="w-full min-h-screen">
-        <Routes>
-          {/* Landing page is always public */}
-          <Route path="/" element={<LandingPage />} />
-          {/* Auth page is public */}
-          <Route path="/auth" element={<AuthForm />} />
+    <ThemeProvider>
+      <Router>
+        <div className="w-full min-h-screen">
+          <Routes>
+            {/* Landing page is always public */}
+            <Route path="/" element={<LandingPage />} />
+            {/* Auth page is public */}
+            <Route path="/auth" element={<AuthForm />} />
 
-          {/* Dashboard and all protected subroutes */}
-          <Route
-            path="/dashboard"
-            element={user ? <Layout /> : <Navigate to="/" replace />}
-          >
-            <Route index element={<Dashboard />} />
-            <Route path="holdings" element={<Holdings />} />
-            <Route path="holdings/add" element={<AddHoldingPage />} />
-            <Route path="insights" element={<Insights />} />
-            <Route path="risk" element={<RiskAnalysis />} />
-            <Route path="charts" element={<Charts />} />
-            {/* Add more nested/protected routes here as needed */}
-          </Route>
+            {/* Dashboard and all protected subroutes */}
+            <Route
+              path="/dashboard"
+              element={user ? <Layout /> : <Navigate to="/" replace />}
+            >
+              <Route index element={<Dashboard />} />
+              <Route path="holdings" element={<Holdings />} />
+              <Route path="holdings/add" element={<AddHoldingPage />} />
+              <Route path="insights" element={<Insights />} />
+              <Route path="risk" element={<RiskAnalysis />} />
+              <Route path="charts" element={<Charts />} />
+              {/* Add more nested/protected routes here as needed */}
+            </Route>
 
-          {/* Catch-all: redirect to landing */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        <Toaster />
-      </div>
-    </Router>
+            {/* Catch-all: redirect to landing */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+          <Toaster />
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 export default App;

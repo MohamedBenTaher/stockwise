@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  CirclePlusIcon as IconCirclePlusFilled,
-  MailIcon as IconMail,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CirclePlusIcon as IconCirclePlusFilled } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -12,7 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export function NavMain({
   items,
@@ -24,40 +20,50 @@ export function NavMain({
   }[];
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
+
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
             <SidebarMenuButton
-              tooltip="Quick Create"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
+              tooltip="Add Holding"
+              onClick={() => navigate("/dashboard/holdings/add")}
+              className="bg-primary/20 text-foreground hover:bg-primary/30 backdrop-blur-sm border border-white/10 min-w-8 duration-200 ease-linear"
             >
               <IconCirclePlusFilled />
-              <span>Quick Create</span>
+              <span>Add Holding</span>
             </SidebarMenuButton>
-            <Button
-              size="icon"
-              className="size-8 group-data-[collapsible=icon]:opacity-0"
-              variant="outline"
-            >
-              <IconMail />
-              <span className="sr-only">Inbox</span>
-            </Button>
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton
-                tooltip={item.title}
-                onClick={() => navigate(item.url)}
-              >
-                {item.icon && <item.icon />}
-                <span>{item.title}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {items.map((item) => {
+            const isActive =
+              location.pathname === item.url ||
+              (item.url !== "/dashboard" &&
+                location.pathname.startsWith(item.url));
+
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  onClick={() => navigate(item.url)}
+                  className={`
+                    transition-all duration-200 ease-linear
+                    ${
+                      isActive
+                        ? "bg-primary/20 text-foreground border border-white/20 backdrop-blur-sm"
+                        : "text-muted-foreground hover:bg-white/10 hover:text-foreground"
+                    }
+                  `}
+                >
+                  {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

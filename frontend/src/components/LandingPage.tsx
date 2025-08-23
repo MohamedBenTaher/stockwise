@@ -16,12 +16,12 @@ export default function LandingPage() {
   return (
     <div className="landing-page min-h-screen bg-background relative overflow-hidden pb-0 w-full">
       <div className="relative z-10 w-full">
-        <main className="w-full max-w-none relative">
+        <main className="w-full max-w-none relative mb-[60em]">
           <div className="landing-section w-full">
             <HeroSection />
           </div>
           {/* Dashboard Preview Wrapper */}
-          <div className="absolute bottom-[-150px] md:bottom-[-400px] left-1/2 transform -translate-x-1/2 z-30">
+          <div className="absolute bottom-[-55em] md:bottom-[-65m] left-1/2 transform -translate-x-1/2 z-30 hz">
             <AnimatedSection>
               <StockWiseDashboardPreview />
             </AnimatedSection>
@@ -29,7 +29,7 @@ export default function LandingPage() {
         </main>
         <div className="landing-section w-full">
           <AnimatedSection
-            className="relative z-10 w-full max-w-[1320px] mx-auto px-6 mt-[411px] md:mt-[400px]"
+            className="relative z-10 w-full max-w-[1320px] mx-auto px-6 mt-[450px] md:mt-[500px]"
             delay={0.1}
           >
             <SocialProof />

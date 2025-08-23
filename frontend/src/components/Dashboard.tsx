@@ -10,13 +10,6 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "./ui/card";
 import { Button } from "./ui/button";
 import { Alert, AlertDescription } from "./ui/alert";
 import { Badge } from "./ui/badge";
@@ -46,8 +39,7 @@ export const Dashboard: React.FC = () => {
 
   const { data: insights, isLoading: insightsLoading } = useLatestInsights();
 
-  const { data: allocationData, isLoading: allocationLoading } =
-    useAllocationData();
+  const { data: allocationData } = useAllocationData();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -124,409 +116,481 @@ export const Dashboard: React.FC = () => {
   const hasHoldings = holdings && holdings.length > 0;
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">Welcome to your portfolio overview</p>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background Pattern - similar to landing page */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 opacity-[0.02]">
+          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern
+                id="grid"
+                width="40"
+                height="40"
+                patternUnits="userSpaceOnUse"
+              >
+                <path
+                  d="M 40 0 L 0 0 0 40"
+                  fill="none"
+                  stroke="hsl(var(--foreground))"
+                  strokeWidth="1"
+                  strokeDasharray="2,2"
+                />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
+        </div>
       </div>
 
-      {/* Portfolio Summary Cards */}
-      {portfolioSummary ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Value</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {formatCurrency(portfolioSummary.total_value)}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {hasHoldings ? "Portfolio value" : "No holdings yet"}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total P/L</CardTitle>
-              {portfolioSummary.total_profit_loss >= 0 ? (
-                <ArrowUpRight className="h-4 w-4 text-green-600" />
-              ) : (
-                <ArrowDownRight className="h-4 w-4 text-red-600" />
-              )}
-            </CardHeader>
-            <CardContent>
-              <div
-                className={`text-2xl font-bold ${
-                  portfolioSummary.total_profit_loss >= 0
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                {formatCurrency(portfolioSummary.total_profit_loss)}
-              </div>
-              <p
-                className={`text-xs ${
-                  portfolioSummary.total_profit_loss >= 0
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                {formatPercentage(
-                  portfolioSummary.total_profit_loss_percentage
-                )}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Holdings</CardTitle>
-              <Briefcase className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {portfolioSummary.holdings_count}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {portfolioSummary.holdings_count === 1 ? "Asset" : "Assets"}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Cost</CardTitle>
-              <PieChart className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {formatCurrency(portfolioSummary.total_cost)}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Initial investment
-              </p>
-            </CardContent>
-          </Card>
+      <div className="relative z-10 space-y-8">
+        {/* Page Header with glass morphism */}
+        <div className="relative">
+          <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
+          <div className="relative p-6">
+            <h1 className="text-3xl font-semibold text-foreground">
+              Dashboard
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Welcome to your portfolio overview
+            </p>
+          </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader className="space-y-0 pb-2">
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-8 bg-gray-200 rounded w-3/4"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
 
-      {/* Performance and Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top Performers */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <TrendingUp className="h-5 w-5 mr-2 text-green-600" />
-              Top Performers
-            </CardTitle>
-            <CardDescription>
-              {hasHoldings
-                ? "Your best performing assets"
-                : "No holdings to display"}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {topPerformers.length > 0 ? (
-              topPerformers.map((holding) => (
+        {/* Portfolio Summary Cards with glass morphism */}
+        {portfolioSummary ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="relative group">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
+              <div className="relative p-6">
+                <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <h3 className="text-sm font-medium text-muted-foreground">
+                    Total Value
+                  </h3>
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  {formatCurrency(portfolioSummary.total_value)}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {hasHoldings ? "Portfolio value" : "No holdings yet"}
+                </p>
+              </div>
+            </div>
+
+            <div className="relative group">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
+              <div className="relative p-6">
+                <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <h3 className="text-sm font-medium text-muted-foreground">
+                    Total P/L
+                  </h3>
+                  {portfolioSummary.total_profit_loss >= 0 ? (
+                    <ArrowUpRight className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <ArrowDownRight className="h-4 w-4 text-red-600" />
+                  )}
+                </div>
                 <div
-                  key={holding.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                  className={`text-2xl font-bold ${
+                    portfolioSummary.total_profit_loss >= 0
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
                 >
-                  <div>
-                    <p className="font-medium text-gray-900">
-                      {holding.ticker}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {formatCurrency(holding.total_value)} • {holding.quantity}{" "}
-                      shares
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <Badge
-                      variant={
-                        holding.profit_loss_percentage >= 0
-                          ? "default"
-                          : "destructive"
-                      }
-                      className="text-xs"
-                    >
-                      {formatPercentage(holding.profit_loss_percentage)}
-                    </Badge>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {formatCurrency(holding.profit_loss)}
-                    </p>
-                  </div>
+                  {formatCurrency(portfolioSummary.total_profit_loss)}
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <Briefcase className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p>Add some holdings to see performance</p>
-                <Button
-                  className="mt-3"
-                  onClick={() => navigate("/holdings/add")}
+                <p
+                  className={`text-xs mt-1 ${
+                    portfolioSummary.total_profit_loss >= 0
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
                 >
-                  Add Holding
-                </Button>
+                  {formatPercentage(
+                    portfolioSummary.total_profit_loss_percentage
+                  )}
+                </p>
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </div>
 
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>
-              Manage your portfolio and get insights
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Button
-              className="w-full"
-              onClick={() => navigate("/holdings/add")}
-            >
-              <DollarSign className="h-4 w-4 mr-2" />
-              Add New Holding
-            </Button>
-            <Button
-              variant="secondary"
-              className="w-full"
-              onClick={() => navigate("/insights")}
-              disabled={!hasHoldings}
-            >
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Generate AI Insights
-            </Button>
-            <Button
-              variant="secondary"
-              className="w-full"
-              onClick={() => navigate("/risk")}
-              disabled={!hasHoldings}
-            >
-              <AlertCircle className="h-4 w-4 mr-2" />
-              View Risk Analysis
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => navigate("/holdings")}
-            >
-              <Briefcase className="h-4 w-4 mr-2" />
-              Manage Holdings
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Insights and Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* AI Insights Preview */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Latest AI Insights</CardTitle>
-            <CardDescription>
-              {insightsLoading
-                ? "Generating insights..."
-                : "AI-powered portfolio analysis"}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {insightsLoading ? (
-              <div className="flex items-center space-x-2 py-4">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm text-gray-600">
-                  Loading insights...
-                </span>
+            <div className="relative group">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
+              <div className="relative p-6">
+                <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <h3 className="text-sm font-medium text-muted-foreground">
+                    Holdings
+                  </h3>
+                  <Briefcase className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  {portfolioSummary.holdings_count}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {portfolioSummary.holdings_count === 1 ? "Asset" : "Assets"}
+                </p>
               </div>
-            ) : insights ? (
+            </div>
+
+            <div className="relative group">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
+              <div className="relative p-6">
+                <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <h3 className="text-sm font-medium text-muted-foreground">
+                    Total Cost
+                  </h3>
+                  <PieChart className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  {formatCurrency(portfolioSummary.total_cost)}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Initial investment
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="relative">
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20 animate-pulse" />
+                <div className="relative p-6">
+                  <div className="h-4 bg-white/20 rounded w-1/2 mb-4"></div>
+                  <div className="h-8 bg-white/20 rounded w-3/4"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Performance and Actions with glass morphism */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Top Performers */}
+          <div className="relative">
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
+            <div className="relative p-6">
+              <div className="pb-4">
+                <h3 className="flex items-center text-lg font-semibold text-foreground">
+                  <TrendingUp className="h-5 w-5 mr-2 text-green-600" />
+                  Top Performers
+                </h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {hasHoldings
+                    ? "Your best performing assets"
+                    : "No holdings to display"}
+                </p>
+              </div>
               <div className="space-y-3">
-                <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
-                  <p className="text-sm font-medium text-blue-900">
-                    Risk Level:{" "}
-                    {insights.insight?.risk_summary?.overall_risk_level ||
-                      "Unknown"}
-                  </p>
-                  <p className="text-xs text-blue-700 mt-1">
-                    Score: {insights.insight?.risk_summary?.risk_score || 0}/100
-                  </p>
-                </div>
-
-                {/* Portfolio Performance Summary */}
-                {portfolioSummary && (
-                  <div className="p-3 rounded-lg bg-gray-50 border border-gray-200">
-                    <p className="text-sm font-medium text-gray-900">
-                      Portfolio Performance
-                    </p>
-                    <p
-                      className={`text-xs mt-1 ${
-                        portfolioSummary.total_profit_loss_percentage >= 0
-                          ? "text-green-700"
-                          : "text-red-700"
-                      }`}
-                    >
-                      {formatPercentage(
-                        portfolioSummary.total_profit_loss_percentage
-                      )}{" "}
-                      overall return
-                    </p>
-                  </div>
-                )}
-
-                {insights.insight?.key_recommendations
-                  ?.slice(0, 2)
-                  .map((rec, index) => (
+                {topPerformers.length > 0 ? (
+                  topPerformers.map((holding) => (
                     <div
-                      key={index}
-                      className="text-sm text-gray-600 p-2 bg-gray-50 rounded"
+                      key={holding.id}
+                      className="flex items-center justify-between p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all duration-200"
                     >
-                      • {rec}
-                    </div>
-                  ))}
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full mt-3"
-                  onClick={() => navigate("/insights")}
-                >
-                  View Full Insights
-                </Button>
-              </div>
-            ) : hasHoldings ? (
-              <div className="text-center py-6 text-gray-500">
-                <p className="mb-3">No recent insights available</p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate("/insights")}
-                >
-                  Generate Insights
-                </Button>
-              </div>
-            ) : (
-              <div className="text-center py-6 text-gray-500">
-                <p>Add holdings to get AI insights</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Portfolio at a Glance */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Portfolio at a Glance</CardTitle>
-            <CardDescription>Key metrics and performance</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {hasHoldings ? (
-              <div className="space-y-4">
-                {/* Best and Worst Performer */}
-                {topPerformers.length > 0 && (
-                  <div className="flex justify-between items-center p-3 rounded-lg bg-green-50">
-                    <div>
-                      <p className="text-sm font-medium text-green-900">
-                        Best Performer
-                      </p>
-                      <p className="text-xs text-green-700">
-                        {topPerformers[0].ticker}
-                      </p>
-                    </div>
-                    <Badge
-                      variant="default"
-                      className="text-green-700 bg-green-100"
-                    >
-                      {formatPercentage(
-                        topPerformers[0].profit_loss_percentage
-                      )}
-                    </Badge>
-                  </div>
-                )}
-
-                {worstPerformers.length > 0 &&
-                  worstPerformers[0].profit_loss_percentage < 0 && (
-                    <div className="flex justify-between items-center p-3 rounded-lg bg-red-50">
                       <div>
-                        <p className="text-sm font-medium text-red-900">
-                          Needs Attention
+                        <p className="font-medium text-foreground">
+                          {holding.ticker}
                         </p>
-                        <p className="text-xs text-red-700">
-                          {worstPerformers[0].ticker}
+                        <p className="text-sm text-muted-foreground">
+                          {formatCurrency(holding.total_value)} •{" "}
+                          {holding.quantity} shares
                         </p>
                       </div>
-                      <Badge
-                        variant="destructive"
-                        className="text-red-700 bg-red-100"
-                      >
-                        {formatPercentage(
-                          worstPerformers[0].profit_loss_percentage
-                        )}
-                      </Badge>
+                      <div className="text-right">
+                        <Badge
+                          variant={
+                            holding.profit_loss_percentage >= 0
+                              ? "default"
+                              : "destructive"
+                          }
+                          className="text-xs bg-white/10 backdrop-blur-sm"
+                        >
+                          {formatPercentage(holding.profit_loss_percentage)}
+                        </Badge>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {formatCurrency(holding.profit_loss)}
+                        </p>
+                      </div>
                     </div>
-                  )}
-
-                {/* Sector Allocation */}
-                {allocationData &&
-                  Object.keys(allocationData.by_sector).length > 0 && (
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-gray-900">
-                        Top Sectors
-                      </p>
-                      {Object.entries(allocationData.by_sector)
-                        .slice(0, 3)
-                        .map(([sector, percentage]: [string, number]) => (
-                          <div
-                            key={sector}
-                            className="flex justify-between items-center text-sm"
-                          >
-                            <span className="text-gray-600">{sector}</span>
-                            <span className="font-medium">
-                              {percentage.toFixed(1)}%
-                            </span>
-                          </div>
-                        ))}
-                    </div>
-                  )}
-
-                <div className="pt-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => navigate("/holdings")}
-                  >
-                    View All Holdings
-                  </Button>
-                </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Briefcase className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                    <p>Add some holdings to see performance</p>
+                    <Button
+                      className="mt-3 bg-primary/20 backdrop-blur-sm border border-white/20 hover:bg-primary/30"
+                      onClick={() => navigate("/dashboard/holdings/add")}
+                    >
+                      Add Holding
+                    </Button>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <PieChart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p className="mb-3">Start building your portfolio</p>
-                <Button onClick={() => navigate("/holdings/add")}>
-                  Add First Holding
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="relative">
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
+            <div className="relative p-6">
+              <div className="pb-4">
+                <h3 className="text-lg font-semibold text-foreground">
+                  Quick Actions
+                </h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Manage your portfolio and get insights
+                </p>
+              </div>
+              <div className="space-y-3">
+                <Button
+                  className="w-full bg-primary/20 backdrop-blur-sm border border-white/20 hover:bg-primary/30 text-foreground"
+                  onClick={() => navigate("/dashboard/holdings/add")}
+                >
+                  <DollarSign className="h-4 w-4 mr-2" />
+                  Add New Holding
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="w-full bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 text-foreground"
+                  onClick={() => navigate("/dashboard/insights")}
+                  disabled={!hasHoldings}
+                >
+                  <TrendingUp className="h-4 w-4 mr-2" />
+                  Generate AI Insights
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="w-full bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 text-foreground"
+                  onClick={() => navigate("/dashboard/risk")}
+                  disabled={!hasHoldings}
+                >
+                  <AlertCircle className="h-4 w-4 mr-2" />
+                  View Risk Analysis
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full bg-transparent backdrop-blur-sm border border-white/20 hover:bg-white/5 text-foreground"
+                  onClick={() => navigate("/dashboard/holdings")}
+                >
+                  <Briefcase className="h-4 w-4 mr-2" />
+                  Manage Holdings
                 </Button>
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </div>
+          </div>
+        </div>
+
+        {/* Insights and Recent Activity with glass morphism */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* AI Insights Preview */}
+          <div className="relative">
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
+            <div className="relative p-6">
+              <div className="pb-4">
+                <h3 className="text-lg font-semibold text-foreground">
+                  Latest AI Insights
+                </h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {insightsLoading
+                    ? "Generating insights..."
+                    : "AI-powered portfolio analysis"}
+                </p>
+              </div>
+              <div>
+                {insightsLoading ? (
+                  <div className="flex items-center space-x-2 py-4">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm text-muted-foreground">
+                      Loading insights...
+                    </span>
+                  </div>
+                ) : insights ? (
+                  <div className="space-y-3">
+                    <div className="p-4 rounded-xl bg-blue-500/10 backdrop-blur-sm border border-blue-500/20">
+                      <p className="text-sm font-medium text-foreground">
+                        Risk Level:{" "}
+                        {insights.insight?.risk_summary?.overall_risk_level ||
+                          "Unknown"}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Score: {insights.insight?.risk_summary?.risk_score || 0}
+                        /100
+                      </p>
+                    </div>
+
+                    {/* Portfolio Performance Summary */}
+                    {portfolioSummary && (
+                      <div className="p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+                        <p className="text-sm font-medium text-foreground">
+                          Portfolio Performance
+                        </p>
+                        <p
+                          className={`text-xs mt-1 ${
+                            portfolioSummary.total_profit_loss_percentage >= 0
+                              ? "text-green-400"
+                              : "text-red-400"
+                          }`}
+                        >
+                          {formatPercentage(
+                            portfolioSummary.total_profit_loss_percentage
+                          )}{" "}
+                          overall return
+                        </p>
+                      </div>
+                    )}
+
+                    {insights.insight?.key_recommendations
+                      ?.slice(0, 2)
+                      .map((rec, index) => (
+                        <div
+                          key={index}
+                          className="text-sm text-muted-foreground p-3 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10"
+                        >
+                          • {rec}
+                        </div>
+                      ))}
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full mt-3 bg-transparent backdrop-blur-sm border border-white/20 hover:bg-white/5 text-foreground"
+                      onClick={() => navigate("/dashboard/insights")}
+                    >
+                      View Full Insights
+                    </Button>
+                  </div>
+                ) : hasHoldings ? (
+                  <div className="text-center py-6 text-muted-foreground">
+                    <p className="mb-3">No recent insights available</p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-transparent backdrop-blur-sm border border-white/20 hover:bg-white/5 text-foreground"
+                      onClick={() => navigate("/dashboard/insights")}
+                    >
+                      Generate Insights
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center py-6 text-muted-foreground">
+                    <p>Add holdings to get AI insights</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Portfolio at a Glance */}
+          <div className="relative">
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
+            <div className="relative p-6">
+              <div className="pb-4">
+                <h3 className="text-lg font-semibold text-foreground">
+                  Portfolio at a Glance
+                </h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Key metrics and performance
+                </p>
+              </div>
+              <div>
+                {hasHoldings ? (
+                  <div className="space-y-4">
+                    {/* Best and Worst Performer */}
+                    {topPerformers.length > 0 && (
+                      <div className="flex justify-between items-center p-4 rounded-xl bg-green-500/10 backdrop-blur-sm border border-green-500/20">
+                        <div>
+                          <p className="text-sm font-medium text-foreground">
+                            Best Performer
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {topPerformers[0].ticker}
+                          </p>
+                        </div>
+                        <Badge
+                          variant="default"
+                          className="bg-green-500/20 text-green-400 border-green-500/30"
+                        >
+                          {formatPercentage(
+                            topPerformers[0].profit_loss_percentage
+                          )}
+                        </Badge>
+                      </div>
+                    )}
+
+                    {worstPerformers.length > 0 &&
+                      worstPerformers[0].profit_loss_percentage < 0 && (
+                        <div className="flex justify-between items-center p-4 rounded-xl bg-red-500/10 backdrop-blur-sm border border-red-500/20">
+                          <div>
+                            <p className="text-sm font-medium text-foreground">
+                              Needs Attention
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {worstPerformers[0].ticker}
+                            </p>
+                          </div>
+                          <Badge
+                            variant="destructive"
+                            className="bg-red-500/20 text-red-400 border-red-500/30"
+                          >
+                            {formatPercentage(
+                              worstPerformers[0].profit_loss_percentage
+                            )}
+                          </Badge>
+                        </div>
+                      )}
+
+                    {/* Sector Allocation */}
+                    {allocationData &&
+                      Object.keys(allocationData.by_sector).length > 0 && (
+                        <div className="space-y-3">
+                          <p className="text-sm font-medium text-foreground">
+                            Top Sectors
+                          </p>
+                          {Object.entries(allocationData.by_sector)
+                            .slice(0, 3)
+                            .map(([sector, percentage]: [string, number]) => (
+                              <div
+                                key={sector}
+                                className="flex justify-between items-center text-sm p-2 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10"
+                              >
+                                <span className="text-muted-foreground">
+                                  {sector}
+                                </span>
+                                <span className="font-medium text-foreground">
+                                  {percentage.toFixed(1)}%
+                                </span>
+                              </div>
+                            ))}
+                        </div>
+                      )}
+
+                    <div className="pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full bg-transparent backdrop-blur-sm border border-white/20 hover:bg-white/5 text-foreground"
+                        onClick={() => navigate("/dashboard/holdings")}
+                      >
+                        View All Holdings
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <PieChart className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                    <p className="mb-3">Start building your portfolio</p>
+                    <Button
+                      className="bg-primary/20 backdrop-blur-sm border border-white/20 hover:bg-primary/30 text-foreground"
+                      onClick={() => navigate("/dashboard/holdings/add")}
+                    >
+                      Add First Holding
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

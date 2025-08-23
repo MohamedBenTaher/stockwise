@@ -10,6 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Menu, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -57,6 +58,7 @@ export function Header() {
           </nav>
         </div>
         <div className="flex items-center gap-4">
+          <ThemeToggle />
           <Link to="/auth" className="hidden md:block">
             <Button
               variant="ghost"
