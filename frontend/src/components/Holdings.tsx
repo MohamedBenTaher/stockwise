@@ -258,155 +258,270 @@ export const Holdings: React.FC = () => {
 
         {/* Edit Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
-          <DialogContent className="sm:max-w-md bg-background/95 backdrop-blur-sm border border-white/20">
-            <DialogHeader>
-              <DialogTitle className="text-foreground">
-                Edit Holding
-              </DialogTitle>
-            </DialogHeader>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4"
-              >
-                <FormField
-                  control={form.control}
-                  name="ticker"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ticker Symbol</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="e.g., AAPL"
-                          {...field}
-                          className="uppercase bg-white/5 backdrop-blur-sm border border-white/20"
-                          onChange={(e) =>
-                            field.onChange(e.target.value.toUpperCase())
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+          <DialogContent className="sm:max-w-2xl bg-gradient-to-br from-background/95 via-background/90 to-background/95 shadow-2xl rounded-3xl border border-white/20 p-0 overflow-hidden">
+            {/* Header Section */}
+            <div className="relative p-8 pb-6 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-b border-white/10">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
+              <DialogHeader className="relative">
+                <DialogTitle className="text-3xl font-bold text-foreground mb-3 tracking-tight bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
+                  Edit Holding
+                </DialogTitle>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Update your stock position details below. All fields are
+                  required.
+                </p>
+              </DialogHeader>
+              {/* Progress indicator */}
+              <div className="absolute bottom-0 left-8 right-8 h-1 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-primary/60 to-primary/80 rounded-full transition-all duration-500 ease-out w-1/4" />
+              </div>
+            </div>
 
-                <FormField
-                  control={form.control}
-                  name="quantity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Quantity</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.001"
-                          placeholder="e.g., 10"
-                          {...field}
-                          className="bg-white/5 backdrop-blur-sm border border-white/20"
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value) || 0)
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+            {/* Form Section */}
+            <div className="p-8 pt-6">
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-8"
+                  role="form"
+                  aria-label="Edit holding form"
+                >
+                  {/* Stock Information Section */}
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="h-8 w-1 bg-gradient-to-b from-primary/60 to-primary/20 rounded-full" />
+                      <h3 className="text-lg font-semibold text-foreground">
+                        Stock Information
+                      </h3>
+                    </div>
 
-                <FormField
-                  control={form.control}
-                  name="buy_price"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Buy Price ($)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="e.g., 150.00"
-                          {...field}
-                          className="bg-white/5 backdrop-blur-sm border border-white/20"
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value) || 0)
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="buy_date"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Purchase Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal bg-white/5 backdrop-blur-sm border border-white/20",
-                                !field.value && "text-muted-foreground"
-                              )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="ticker"
+                        render={({ field }) => (
+                          <FormItem className="group">
+                            <FormLabel className="text-foreground font-semibold text-sm flex items-center gap-2">
+                              <div className="h-2 w-2 bg-primary/60 rounded-full" />
+                              Ticker Symbol
+                            </FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Input
+                                  placeholder="e.g., AAPL"
+                                  {...field}
+                                  className="uppercase h-12 border-input bg-white/10 dark:bg-white/5 backdrop-blur-xl text-foreground placeholder:text-muted-foreground focus:bg-white/20 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 focus:ring-offset-0 transition-all duration-300 group-hover:border-primary/40"
+                                  onChange={(e) =>
+                                    field.onChange(e.target.value.toUpperCase())
+                                  }
+                                  aria-describedby="ticker-help"
+                                />
+                                <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                              </div>
+                            </FormControl>
+                            <div
+                              id="ticker-help"
+                              className="text-xs text-muted-foreground mt-2 ml-4"
                             >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent
-                          className="w-auto p-0 bg-background/95 backdrop-blur-sm border border-white/20"
-                          align="start"
-                        >
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                              Enter the stock ticker symbol (e.g., AAPL, TSLA,
+                              MSFT)
+                            </div>
+                            <FormMessage className="text-red-400 text-xs ml-4" />
+                          </FormItem>
+                        )}
+                      />
 
-                <div className="flex justify-end space-x-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleDialogClose}
-                    className="bg-transparent backdrop-blur-sm border border-white/20 hover:bg-white/5"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="bg-primary/20 backdrop-blur-sm border border-white/20 hover:bg-primary/30"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Updating...
-                      </>
-                    ) : (
-                      "Update Holding"
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </Form>
+                      <FormField
+                        control={form.control}
+                        name="quantity"
+                        render={({ field }) => (
+                          <FormItem className="group">
+                            <FormLabel className="text-foreground font-semibold text-sm flex items-center gap-2">
+                              <div className="h-2 w-2 bg-primary/60 rounded-full" />
+                              Shares Owned
+                            </FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Input
+                                  type="number"
+                                  step="0.001"
+                                  placeholder="e.g., 10.5"
+                                  {...field}
+                                  className="h-12 border-input bg-white/10 dark:bg-white/5 backdrop-blur-xl text-foreground placeholder:text-muted-foreground focus:bg-white/20 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 focus:ring-offset-0 transition-all duration-300 group-hover:border-primary/40"
+                                  onChange={(e) =>
+                                    field.onChange(
+                                      parseFloat(e.target.value) || 0
+                                    )
+                                  }
+                                  aria-describedby="quantity-help"
+                                />
+                                <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                              </div>
+                            </FormControl>
+                            <div
+                              id="quantity-help"
+                              className="text-xs text-muted-foreground mt-2 ml-4"
+                            >
+                              Total number of shares you own (supports
+                              fractional shares)
+                            </div>
+                            <FormMessage className="text-red-400 text-xs ml-4" />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Purchase Details Section */}
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="h-8 w-1 bg-gradient-to-b from-primary/60 to-primary/20 rounded-full" />
+                      <h3 className="text-lg font-semibold text-foreground">
+                        Purchase Details
+                      </h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="buy_price"
+                        render={({ field }) => (
+                          <FormItem className="group">
+                            <FormLabel className="text-foreground font-semibold text-sm flex items-center gap-2">
+                              <div className="h-2 w-2 bg-primary/60 rounded-full" />
+                              Purchase Price
+                            </FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground font-medium">
+                                  $
+                                </div>
+                                <Input
+                                  type="number"
+                                  step="0.01"
+                                  placeholder="150.00"
+                                  {...field}
+                                  className="h-12 pl-8 border-input bg-white/10 dark:bg-white/5 backdrop-blur-xl text-foreground placeholder:text-muted-foreground focus:bg-white/20 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 focus:ring-offset-0 transition-all duration-300 group-hover:border-primary/40"
+                                  onChange={(e) =>
+                                    field.onChange(
+                                      parseFloat(e.target.value) || 0
+                                    )
+                                  }
+                                  aria-describedby="price-help"
+                                />
+                                <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                              </div>
+                            </FormControl>
+                            <div
+                              id="price-help"
+                              className="text-xs text-muted-foreground mt-2 ml-4"
+                            >
+                              The price per share when you purchased the stock
+                            </div>
+                            <FormMessage className="text-red-400 text-xs ml-4" />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="buy_date"
+                        render={({ field }) => (
+                          <FormItem className="group flex flex-col">
+                            <FormLabel className="text-foreground font-semibold text-sm flex items-center gap-2">
+                              <div className="h-2 w-2 bg-primary/60 rounded-full" />
+                              Purchase Date
+                            </FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Button
+                                      variant="outline"
+                                      className={cn(
+                                        "w-full h-12 pl-3 pr-10 text-left font-normal border-input bg-white/10 dark:bg-white/5 backdrop-blur-xl text-foreground focus:bg-white/20 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 focus:ring-offset-0 transition-all duration-300 group-hover:border-primary/40 justify-start",
+                                        !field.value && "text-muted-foreground"
+                                      )}
+                                      aria-describedby="date-help"
+                                    >
+                                      {field.value ? (
+                                        format(field.value, "PPP")
+                                      ) : (
+                                        <span>Select purchase date</span>
+                                      )}
+                                      <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 opacity-50" />
+                                    </Button>
+                                    <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                                  </div>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className="w-auto p-0 bg-background/98 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl"
+                                align="start"
+                              >
+                                <Calendar
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  disabled={(date) =>
+                                    date > new Date() ||
+                                    date < new Date("1900-01-01")
+                                  }
+                                  initialFocus
+                                  className="rounded-2xl"
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <div
+                              id="date-help"
+                              className="text-xs text-muted-foreground mt-2 ml-4"
+                            >
+                              When did you purchase these shares?
+                            </div>
+                            <FormMessage className="text-red-400 text-xs ml-4" />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex justify-between items-center pt-6 border-t border-white/10">
+                    <div className="text-xs text-muted-foreground">
+                      All changes will be saved immediately
+                    </div>
+                    <div className="flex gap-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleDialogClose}
+                        className="h-11 px-6 bg-transparent border-input backdrop-blur-xl hover:bg-white/10 text-foreground font-medium rounded-xl transition-all duration-300 hover:shadow-lg hover:scale-105"
+                        disabled={isSubmitting}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="h-11 px-8 bg-gradient-to-r from-primary/80 to-primary/90 border-0 backdrop-blur-xl hover:from-primary/90 hover:to-primary text-primary-foreground font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-3"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span>Updating...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>Update Holding</span>
+                            <div className="h-2 w-2 bg-primary-foreground/60 rounded-full animate-pulse" />
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </form>
+              </Form>
+            </div>
           </DialogContent>
         </Dialog>
 

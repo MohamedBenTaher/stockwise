@@ -188,12 +188,16 @@ const Charts: React.FC = () => {
 
           <div className="flex items-center gap-4">
             <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] bg-white/10 backdrop-blur-sm border-white/20 text-foreground hover:bg-white/15 focus:bg-white/15 focus:border-white/30">
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white/10 backdrop-blur-md border-white/20 text-foreground">
                 {periods.map((period) => (
-                  <SelectItem key={period.value} value={period.value}>
+                  <SelectItem
+                    key={period.value}
+                    value={period.value}
+                    className="text-foreground hover:bg-white/20 focus:bg-white/20 focus:text-foreground"
+                  >
                     {period.label}
                   </SelectItem>
                 ))}
