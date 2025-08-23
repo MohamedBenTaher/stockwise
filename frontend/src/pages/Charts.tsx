@@ -174,28 +174,32 @@ const Charts: React.FC = () => {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Portfolio Charts
-          </h1>
-          <p className="text-muted-foreground">
-            Visualize your portfolio performance and allocation
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select period" />
-            </SelectTrigger>
-            <SelectContent>
-              {periods.map((period) => (
-                <SelectItem key={period.value} value={period.value}>
-                  {period.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <div className="relative">
+        <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
+        <div className="relative p-6 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-semibold text-foreground">
+              Portfolio Charts
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Visualize your portfolio performance and allocation
+            </p>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select period" />
+              </SelectTrigger>
+              <SelectContent>
+                {periods.map((period) => (
+                  <SelectItem key={period.value} value={period.value}>
+                    {period.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 

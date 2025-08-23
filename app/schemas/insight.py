@@ -4,6 +4,10 @@ from datetime import datetime
 
 
 class InsightRequest(BaseModel):
+    analysis_type: str = "full"  # full, risk, diversification
+
+
+class InsightRequestInternal(BaseModel):
     user_id: int
     analysis_type: str = "full"  # full, risk, diversification
 

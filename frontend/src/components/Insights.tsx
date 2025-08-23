@@ -93,25 +93,115 @@ export const Insights: React.FC = () => {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">AI Insights</h1>
-            <p className="text-gray-600">
-              {isGenerating
-                ? "Generating insights..."
-                : "Loading portfolio insights"}
-            </p>
+        {/* Header Skeleton */}
+        <div className="relative">
+          <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
+          <div className="relative p-6 flex justify-between items-center">
+            <div>
+              <div className="h-8 w-48 bg-gradient-to-r from-white/10 to-white/5 rounded-lg animate-pulse" />
+              <div className="h-4 w-64 bg-gradient-to-r from-white/10 to-white/5 rounded-lg animate-pulse mt-2" />
+            </div>
+            <div className="h-10 w-40 bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" />
           </div>
         </div>
 
-        <div className="flex items-center justify-center h-64">
-          <div className="flex items-center space-x-2">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span>
-              {isGenerating
-                ? "Analyzing your portfolio..."
-                : "Loading insights..."}
-            </span>
+        {/* Risk Analysis Skeleton */}
+        <div className="relative">
+          <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
+          <div className="relative p-6 space-y-4">
+            <div className="flex items-center space-x-2">
+              <div className="h-5 w-5 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+              <div className="h-6 w-32 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+            </div>
+            <div className="h-4 w-48 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+
+            <div className="flex items-center justify-between pt-4">
+              <div className="space-y-2">
+                <div className="h-4 w-16 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+                <div className="h-6 w-20 bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" />
+              </div>
+              <div className="text-right space-y-2">
+                <div className="h-4 w-20 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+                <div className="h-8 w-16 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+              </div>
+            </div>
+
+            <div className="h-2 w-full bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" />
+          </div>
+        </div>
+
+        {/* Key Recommendations Skeleton */}
+        <div className="relative">
+          <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
+          <div className="relative p-6 space-y-4">
+            <div className="flex items-center space-x-2">
+              <div className="h-5 w-5 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+              <div className="h-6 w-40 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+            </div>
+            <div className="h-4 w-56 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+
+            <div className="space-y-3 pt-4">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="flex items-start space-x-3 p-4 rounded-lg bg-white/5 border border-white/10"
+                >
+                  <div className="h-5 w-5 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse mt-0.5" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-32 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+                    <div className="h-4 w-full bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+                    <div className="h-4 w-3/4 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Cards Skeleton */}
+        <div className="grid gap-6 md:grid-cols-2">
+          {[1, 2].map((i) => (
+            <div key={i} className="relative">
+              <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
+              <div className="relative p-6 space-y-4">
+                <div className="flex items-center space-x-2">
+                  <div className="h-5 w-5 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+                  <div className="h-6 w-32 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+                </div>
+                <div className="h-4 w-40 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+
+                <div className="space-y-3 pt-4">
+                  {[1, 2].map((j) => (
+                    <div
+                      key={j}
+                      className="p-3 rounded-lg bg-white/5 border border-white/10"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="h-4 w-24 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+                        <div className="h-4 w-16 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+                      </div>
+                      <div className="h-3 w-full bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+                      <div className="h-3 w-2/3 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse mt-2" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Loading Indicator */}
+        <div className="relative">
+          <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
+          <div className="relative p-6 flex items-center justify-center">
+            <div className="flex items-center space-x-3">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <span className="text-muted-foreground font-medium">
+                {isGenerating
+                  ? "Analyzing your portfolio with AI..."
+                  : "Loading insights..."}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -178,25 +268,32 @@ export const Insights: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">AI Insights</h1>
-          <p className="text-gray-600">AI-powered portfolio analysis</p>
+      <div className="relative">
+        <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
+        <div className="relative p-6 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-semibold text-foreground">
+              AI Insights
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              AI-powered portfolio analysis
+            </p>
+          </div>
+          <Button
+            onClick={handleGenerateInsights}
+            disabled={isGenerating}
+            className="flex items-center space-x-2"
+          >
+            {isGenerating ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4" />
+            )}
+            <span>
+              {isGenerating ? "Generating..." : "Generate New Insights"}
+            </span>
+          </Button>
         </div>
-        <Button
-          onClick={handleGenerateInsights}
-          disabled={isGenerating}
-          className="flex items-center space-x-2"
-        >
-          {isGenerating ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <RefreshCw className="h-4 w-4" />
-          )}
-          <span>
-            {isGenerating ? "Generating..." : "Generate New Insights"}
-          </span>
-        </Button>
       </div>
 
       {insights ? (

@@ -6,7 +6,7 @@ import time
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 from app.schemas.insight import (
-    InsightRequest,
+    InsightRequestInternal,
     InsightResponse,
     AIInsight,
     RiskSummary,
@@ -21,7 +21,9 @@ class AIService:
         self.db = db
         self.holding_service = HoldingService(db)
 
-    async def generate_insights(self, request: InsightRequest) -> InsightResponse:
+    async def generate_insights(
+        self, request: InsightRequestInternal
+    ) -> InsightResponse:
         """Generate AI-powered portfolio insights."""
         start_time = time.time()
 
@@ -275,5 +277,5 @@ Focus on actionable insights. Keep language professional but accessible.
         """Get the latest insights for a user."""
         # For now, generate new insights each time
         # In production, you'd store and retrieve from database
-        request = InsightRequest(user_id=user_id)
+        request = InsightRequestInternal(user_id=user_id)
         return await self.generate_insights(request)
