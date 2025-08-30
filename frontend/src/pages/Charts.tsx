@@ -172,38 +172,35 @@ const Charts: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6 glass-card">
       {/* Header */}
-      <div className="relative">
-        <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
-        <div className="relative p-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-semibold text-foreground">
-              Portfolio Charts
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Visualize your portfolio performance and allocation
-            </p>
-          </div>
+      <div className="glass-card p-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-semibold text-foreground">
+            Portfolio Charts
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Visualize your portfolio performance and allocation
+          </p>
+        </div>
 
-          <div className="flex items-center gap-4">
-            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-              <SelectTrigger className="w-[180px] bg-white/10 backdrop-blur-sm border-white/20 text-foreground hover:bg-white/15 focus:bg-white/15 focus:border-white/30">
-                <SelectValue placeholder="Select period" />
-              </SelectTrigger>
-              <SelectContent className="bg-white/10 backdrop-blur-md border-white/20 text-foreground">
-                {periods.map((period) => (
-                  <SelectItem
-                    key={period.value}
-                    value={period.value}
-                    className="text-foreground hover:bg-white/20 focus:bg-white/20 focus:text-foreground"
-                  >
-                    {period.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="flex items-center gap-4">
+          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+            <SelectTrigger className="w-[180px] bg-white/10 backdrop-blur-sm border-white/20 text-foreground hover:bg-white/15 focus:bg-white/15 focus:border-white/30">
+              <SelectValue placeholder="Select period" />
+            </SelectTrigger>
+            <SelectContent className="bg-white/10 backdrop-blur-md border-white/20 text-foreground">
+              {periods.map((period) => (
+                <SelectItem
+                  key={period.value}
+                  value={period.value}
+                  className="text-foreground hover:bg-white/20 focus:bg-white/20 focus:text-foreground"
+                >
+                  {period.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

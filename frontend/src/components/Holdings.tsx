@@ -170,17 +170,14 @@ export const Holdings: React.FC = () => {
 
         <div className="relative z-10 space-y-8">
           {/* Page Header with glass morphism */}
-          <div className="relative">
-            <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
-            <div className="relative p-6 flex justify-between items-center">
-              <div>
-                <h1 className="text-3xl font-semibold text-foreground">
-                  Holdings
-                </h1>
-                <p className="text-muted-foreground mt-2">
-                  Manage your portfolio holdings
-                </p>
-              </div>
+          <div className="glass-card p-6">
+            <div>
+              <h1 className="text-3xl font-semibold text-foreground">
+                Holdings
+              </h1>
+              <p className="text-muted-foreground mt-2">
+                Manage your portfolio holdings
+              </p>
             </div>
           </div>
 
@@ -235,25 +232,20 @@ export const Holdings: React.FC = () => {
 
       <div className="relative z-10 space-y-8">
         {/* Page Header with glass morphism */}
-        <div className="relative">
-          <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
-          <div className="relative p-6 flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-semibold text-foreground">
-                Holdings
-              </h1>
-              <p className="text-muted-foreground mt-2">
-                Manage your portfolio holdings
-              </p>
-            </div>
-            <Button
-              onClick={() => navigate("/dashboard/holdings/add")}
-              className="bg-primary/20 backdrop-blur-sm border border-white/20 hover:bg-primary/30 text-foreground"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Holding
-            </Button>
+        <div className="glass-card p-6 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-semibold text-foreground">Holdings</h1>
+            <p className="text-muted-foreground mt-2">
+              Manage your portfolio holdings
+            </p>
           </div>
+          <Button
+            onClick={() => navigate("/dashboard/holdings/add")}
+            className="bg-primary/20 backdrop-blur-sm border border-white/20 hover:bg-primary/30 text-foreground"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Holding
+          </Button>
         </div>
 
         {/* Edit Dialog */}
@@ -526,142 +518,137 @@ export const Holdings: React.FC = () => {
         </Dialog>
 
         {/* Holdings Table with glass morphism */}
-        <div className="relative">
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
-          <div className="relative p-6">
-            <div className="pb-4">
-              <h3 className="text-lg font-semibold text-foreground">
-                Your Holdings
-              </h3>
-            </div>
-            {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <span className="ml-2 text-muted-foreground">
-                  Loading holdings...
-                </span>
-              </div>
-            ) : holdings.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-muted-foreground/50 text-6xl mb-4">📊</div>
-                <h3 className="text-xl font-medium text-foreground mb-2">
-                  No Holdings Yet
-                </h3>
-                <p className="text-muted-foreground mb-6">
-                  Start building your portfolio by adding your first holding.
-                </p>
-                <Button
-                  onClick={() => navigate("/dashboard/holdings/add")}
-                  className="bg-primary/20 backdrop-blur-sm border border-white/20 hover:bg-primary/30"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Your First Holding
-                </Button>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-white/10">
-                      <TableHead className="text-muted-foreground">
-                        Ticker
-                      </TableHead>
-                      <TableHead className="text-muted-foreground">
-                        Quantity
-                      </TableHead>
-                      <TableHead className="text-muted-foreground">
-                        Buy Price
-                      </TableHead>
-                      <TableHead className="text-muted-foreground">
-                        Current Price
-                      </TableHead>
-                      <TableHead className="text-muted-foreground">
-                        Total Value
-                      </TableHead>
-                      <TableHead className="text-muted-foreground">
-                        P/L
-                      </TableHead>
-                      <TableHead className="text-muted-foreground">
-                        P/L %
-                      </TableHead>
-                      <TableHead className="text-muted-foreground">
-                        Actions
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {holdings.map((holding) => (
-                      <TableRow
-                        key={holding.id}
-                        className="border-white/10 hover:bg-white/5"
-                      >
-                        <TableCell className="font-medium text-foreground">
-                          {holding.ticker}
-                        </TableCell>
-                        <TableCell className="text-foreground">
-                          {holding.quantity}
-                        </TableCell>
-                        <TableCell className="text-foreground">
-                          {formatCurrency(holding.buy_price)}
-                        </TableCell>
-                        <TableCell className="text-foreground">
-                          {formatCurrency(holding.current_price)}
-                        </TableCell>
-                        <TableCell className="text-foreground">
-                          {formatCurrency(holding.total_value)}
-                        </TableCell>
-                        <TableCell
-                          className={`${
-                            holding.profit_loss >= 0
-                              ? "text-green-400"
-                              : "text-red-400"
-                          }`}
-                        >
-                          {formatCurrency(holding.profit_loss)}
-                        </TableCell>
-                        <TableCell
-                          className={`${
-                            holding.profit_loss_percentage >= 0
-                              ? "text-green-400"
-                              : "text-red-400"
-                          }`}
-                        >
-                          {formatPercentage(holding.profit_loss_percentage)}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEdit(holding)}
-                              className="bg-transparent backdrop-blur-sm border border-white/20 hover:bg-white/5"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                handleDelete(holding.id, holding.ticker)
-                              }
-                              disabled={deleteHoldingMutation.isPending}
-                              className="bg-transparent backdrop-blur-sm border border-red-500/20 hover:bg-red-500/10 text-red-400"
-                            >
-                              {deleteHoldingMutation.isPending ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <Trash2 className="h-4 w-4" />
-                              )}
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
+        <div className="glass-card p-6">
+          <div className="pb-4">
+            <h3 className="text-lg font-semibold text-foreground">
+              Your Holdings
+            </h3>
           </div>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <span className="ml-2 text-muted-foreground">
+                Loading holdings...
+              </span>
+            </div>
+          ) : holdings.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-muted-foreground/50 text-6xl mb-4">📊</div>
+              <h3 className="text-xl font-medium text-foreground mb-2">
+                No Holdings Yet
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                Start building your portfolio by adding your first holding.
+              </p>
+              <Button
+                onClick={() => navigate("/dashboard/holdings/add")}
+                className="bg-primary/20 backdrop-blur-sm border border-white/20 hover:bg-primary/30"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Your First Holding
+              </Button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-white/10">
+                    <TableHead className="text-muted-foreground">
+                      Ticker
+                    </TableHead>
+                    <TableHead className="text-muted-foreground">
+                      Quantity
+                    </TableHead>
+                    <TableHead className="text-muted-foreground">
+                      Buy Price
+                    </TableHead>
+                    <TableHead className="text-muted-foreground">
+                      Current Price
+                    </TableHead>
+                    <TableHead className="text-muted-foreground">
+                      Total Value
+                    </TableHead>
+                    <TableHead className="text-muted-foreground">P/L</TableHead>
+                    <TableHead className="text-muted-foreground">
+                      P/L %
+                    </TableHead>
+                    <TableHead className="text-muted-foreground">
+                      Actions
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {holdings.map((holding) => (
+                    <TableRow
+                      key={holding.id}
+                      className="border-white/10 hover:bg-white/5"
+                    >
+                      <TableCell className="font-medium text-foreground">
+                        {holding.ticker}
+                      </TableCell>
+                      <TableCell className="text-foreground">
+                        {holding.quantity}
+                      </TableCell>
+                      <TableCell className="text-foreground">
+                        {formatCurrency(holding.buy_price)}
+                      </TableCell>
+                      <TableCell className="text-foreground">
+                        {formatCurrency(holding.current_price)}
+                      </TableCell>
+                      <TableCell className="text-foreground">
+                        {formatCurrency(holding.total_value)}
+                      </TableCell>
+                      <TableCell
+                        className={`${
+                          holding.profit_loss >= 0
+                            ? "text-green-400"
+                            : "text-red-400"
+                        }`}
+                      >
+                        {formatCurrency(holding.profit_loss)}
+                      </TableCell>
+                      <TableCell
+                        className={`${
+                          holding.profit_loss_percentage >= 0
+                            ? "text-green-400"
+                            : "text-red-400"
+                        }`}
+                      >
+                        {formatPercentage(holding.profit_loss_percentage)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit(holding)}
+                            className="bg-transparent backdrop-blur-sm border border-white/20 hover:bg-white/5"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handleDelete(holding.id, holding.ticker)
+                            }
+                            disabled={deleteHoldingMutation.isPending}
+                            className="bg-transparent backdrop-blur-sm border border-red-500/20 hover:bg-red-500/10 text-red-400"
+                          >
+                            {deleteHoldingMutation.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </div>
       </div>
     </div>

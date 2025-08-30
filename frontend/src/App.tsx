@@ -20,6 +20,7 @@ import { useUser } from "./hooks/useAuth";
 import { Loader2 } from "lucide-react";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import "./App.css";
+import { News } from "./components/News";
 
 function App() {
   const { data: user, isLoading, error } = useUser();
@@ -59,6 +60,7 @@ function App() {
               element={user ? <Layout /> : <Navigate to="/" replace />}
             >
               <Route index element={<Dashboard />} />
+              <Route path="news" element={<News />} />
               <Route path="holdings" element={<Holdings />} />
               <Route path="holdings/add" element={<AddHoldingPage />} />
               <Route path="insights" element={<Insights />} />

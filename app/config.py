@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = "stockwise_password"
 
     # UI Directory
-    UI_DIRECTORY: str = "stockwise/frontend"
+    UI_DIRECTORY: str = "frontend"
 
     # Database Pool Settings
     DB_POOL_SIZE: int = 10

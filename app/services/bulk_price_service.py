@@ -531,43 +531,35 @@ class BulkPriceService:
             return None
 
     async def get_prices(self, tickers: List[str]) -> Dict[str, float]:
-        """Get prices for specific tickers from cache or fetch."""
+        """Get prices for specific tickers from cache only - no live API calls."""
         try:
-            # First, try to get from cache
+            # Always try cache first - never make live API calls during requests
             cached_prices = await self.get_cached_prices()
 
             if cached_prices:
                 # Return requested tickers from cache
                 result = {}
-                missing_tickers = []
-
                 for ticker in tickers:
-                    if ticker.upper() in cached_prices:
-                        result[ticker] = cached_prices[ticker.upper()]
+                    ticker_upper = ticker.upper()
+                    if ticker_upper in cached_prices:
+                        result[ticker] = cached_prices[ticker_upper]
                     else:
-                        missing_tickers.append(ticker)
+                        # Use fallback instead of making API call
+                        result[ticker] = self.fallback_prices.get(ticker_upper, 100.0)
+                        logger.info(
+                            f"Using fallback price for {ticker}: {result[ticker]}"
+                        )
+                return result
 
-                # If we have most tickers from cache, just use fallbacks for missing
-                if len(missing_tickers) <= len(tickers) * 0.2:  # 20% or less missing
-                    for ticker in missing_tickers:
-                        result[ticker] = self.fallback_prices.get(ticker.upper(), 100.0)
-                    return result
+            # If no cache available, use all fallback prices and trigger background refresh
+            logger.warning(
+                "No cached prices available, using fallbacks and triggering background refresh"
+            )
 
-            # If cache miss or too many missing tickers, check if we should bulk fetch
-            if await self.should_fetch_bulk_data():
-                logger.info("🔄 Cache miss or expired, fetching bulk data...")
-                bulk_prices = await self.fetch_bulk_prices()
-                await self.cache_bulk_prices(bulk_prices)
+            # Trigger background refresh asynchronously (don't wait for it)
+            asyncio.create_task(self._trigger_background_refresh())
 
-                # Return requested tickers from fresh bulk data
-                return {
-                    ticker: bulk_prices.get(
-                        ticker.upper(), self.fallback_prices.get(ticker.upper(), 100.0)
-                    )
-                    for ticker in tickers
-                }
-
-            # Fallback to individual fallback prices
+            # Return fallback prices immediately
             return {
                 ticker: self.fallback_prices.get(ticker.upper(), 100.0)
                 for ticker in tickers
@@ -580,8 +572,19 @@ class BulkPriceService:
                 for ticker in tickers
             }
 
+    async def _trigger_background_refresh(self):
+        """Trigger background refresh without blocking the request."""
+        try:
+            from app.celery import fetch_and_cache_bulk_prices_task
+
+            # Trigger Celery task asynchronously
+            fetch_and_cache_bulk_prices_task.delay()
+            logger.info("🔄 Triggered background price refresh via Celery")
+        except Exception as e:
+            logger.warning(f"Failed to trigger background refresh: {e}")
+
     async def get_single_price(self, ticker: str) -> float:
-        """Get price for a single ticker."""
+        """Get price for a single ticker from cache only."""
         prices = await self.get_prices([ticker])
         return prices.get(ticker, self.fallback_prices.get(ticker.upper(), 100.0))
 

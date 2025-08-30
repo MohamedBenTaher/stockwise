@@ -1,5 +1,5 @@
-# Update the user model to include relationship
-from sqlalchemy.orm import relationship
+from .user import User
+from .holding import Holding
+from .bookmark import Bookmark
 
-# Add this to the User class in user.py:
-# holdings = relationship("Holding", back_populates="user")
+__all__ = ["User", "Holding", "Bookmark"]

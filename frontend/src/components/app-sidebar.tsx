@@ -18,6 +18,7 @@ import {
   SearchIcon as IconSearch,
   SettingsIcon as IconSettings,
   UsersIcon as IconUsers,
+  NewspaperIcon as IconNewspaper,
 } from "lucide-react";
 
 import { NavDocuments } from "@/components/nav-documents";
@@ -41,6 +42,11 @@ const data = {
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
+    {
+      title: "News",
+      url: "/dashboard/news",
+      icon: IconNewspaper,
+    },
     {
       title: "Dashboard",
       url: "/dashboard",
@@ -66,6 +72,7 @@ const data = {
       url: "/dashboard/risk",
       icon: IconFolder,
     },
+
     {
       title: "Team",
       url: "#",

@@ -37,18 +37,22 @@ interface Stock {
 
 interface StockTickerComboboxProps {
   value?: string;
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
+  onValueChange?: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
   allowCustomAssets?: boolean; // New prop to allow custom assets like crypto, commodities
+  className?: string;
 }
 
 const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
   value,
   onChange,
+  onValueChange,
   placeholder = "Select stock ticker...",
   disabled = false,
   allowCustomAssets = true,
+  className,
 }) => {
   const [open, setOpen] = useState(false);
   const [customDialogOpen, setCustomDialogOpen] = useState(false);
@@ -63,6 +67,9 @@ const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
     "stock" | "crypto" | "commodity" | "other"
   >("stock");
   const [lastCacheUpdate, setLastCacheUpdate] = useState<number>(0);
+
+  // Use onValueChange if provided, otherwise use onChange
+  const handleValueChange = onValueChange || onChange;
 
   // Enhanced fallback stock list with more variety
   const fallbackStocks: Stock[] = [
@@ -282,7 +289,7 @@ const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
       setOpen(false);
       return;
     }
-    onChange(selectedValue);
+    handleValueChange?.(selectedValue);
     setOpen(false);
   };
 
@@ -303,7 +310,7 @@ const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
             : ticker,
         };
         setStocks((prev) => [newStock, ...prev]);
-        onChange(ticker);
+        handleValueChange?.(ticker);
         setCustomDialogOpen(false);
         setCustomTicker("");
         setCustomName("");
@@ -318,7 +325,7 @@ const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
         label: customName.trim() ? `${ticker} - ${customName.trim()}` : ticker,
       };
       setStocks((prev) => [newStock, ...prev]);
-      onChange(ticker);
+      handleValueChange?.(ticker);
       setCustomDialogOpen(false);
       setCustomTicker("");
       setCustomName("");
@@ -336,7 +343,7 @@ const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between"
+            className={cn("w-full justify-between", className)}
             disabled={disabled}
           >
             {selectedStock ? (

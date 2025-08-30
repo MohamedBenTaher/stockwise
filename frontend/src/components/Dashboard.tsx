@@ -144,172 +144,153 @@ export const Dashboard: React.FC = () => {
 
       <div className="relative z-10 space-y-8">
         {/* Page Header with glass morphism */}
-        <div className="relative">
-          <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
-          <div className="relative p-6">
-            <h1 className="text-3xl font-semibold text-foreground">
-              Dashboard
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Welcome to your portfolio overview
-            </p>
-          </div>
+        <div className="glass-card p-6">
+          <h1 className="text-3xl font-semibold text-foreground">
+            Dashboard
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Welcome to your portfolio overview
+          </p>
         </div>
 
         {/* Portfolio Summary Cards with glass morphism */}
         {portfolioSummary ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="relative group">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
-              <div className="relative p-6">
-                <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <h3 className="text-sm font-medium text-muted-foreground">
-                    Total Value
-                  </h3>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div className="text-2xl font-bold text-foreground">
-                  {formatCurrency(portfolioSummary.total_value)}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {hasHoldings ? "Portfolio value" : "No holdings yet"}
-                </p>
+            <div className="glass-card p-6 group">
+              <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <h3 className="text-sm font-medium text-muted-foreground">
+                  Total Value
+                </h3>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
               </div>
+              <div className="text-2xl font-bold text-foreground">
+                {formatCurrency(portfolioSummary.total_value)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {hasHoldings ? "Portfolio value" : "No holdings yet"}
+              </p>
             </div>
 
-            <div className="relative group">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
-              <div className="relative p-6">
-                <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <h3 className="text-sm font-medium text-muted-foreground">
-                    Total P/L
-                  </h3>
+            <div className="glass-card p-6 group">
+              <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <h3 className="text-sm font-medium text-muted-foreground">
+                  Total P/L
+                </h3>
                   {portfolioSummary.total_profit_loss >= 0 ? (
-                    <ArrowUpRight className="h-4 w-4 text-green-600" />
-                  ) : (
-                    <ArrowDownRight className="h-4 w-4 text-red-600" />
-                  )}
-                </div>
-                <div
-                  className={`text-2xl font-bold ${
-                    portfolioSummary.total_profit_loss >= 0
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {formatCurrency(portfolioSummary.total_profit_loss)}
-                </div>
-                <p
-                  className={`text-xs mt-1 ${
-                    portfolioSummary.total_profit_loss >= 0
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {formatPercentage(
-                    portfolioSummary.total_profit_loss_percentage
-                  )}
-                </p>
+                  <ArrowUpRight className="h-4 w-4 text-green-600" />
+                ) : (
+                  <ArrowDownRight className="h-4 w-4 text-red-600" />
+                )}
               </div>
+              <div
+                className={`text-2xl font-bold ${
+                  portfolioSummary.total_profit_loss >= 0
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
+                {formatCurrency(portfolioSummary.total_profit_loss)}
+              </div>
+              <p
+                className={`text-xs mt-1 ${
+                  portfolioSummary.total_profit_loss >= 0
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
+                {formatPercentage(
+                  portfolioSummary.total_profit_loss_percentage
+                )}
+              </p>
             </div>
 
-            <div className="relative group">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
-              <div className="relative p-6">
-                <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <h3 className="text-sm font-medium text-muted-foreground">
-                    Holdings
-                  </h3>
-                  <Briefcase className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div className="text-2xl font-bold text-foreground">
-                  {portfolioSummary.holdings_count}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {portfolioSummary.holdings_count === 1 ? "Asset" : "Assets"}
-                </p>
+            <div className="glass-card p-6 group">
+              <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <h3 className="text-sm font-medium text-muted-foreground">
+                  Holdings
+                </h3>
+                <Briefcase className="h-4 w-4 text-muted-foreground" />
               </div>
+              <div className="text-2xl font-bold text-foreground">
+                {portfolioSummary.holdings_count}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {portfolioSummary.holdings_count === 1 ? "Asset" : "Assets"}
+              </p>
             </div>
 
-            <div className="relative group">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
-              <div className="relative p-6">
-                <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <h3 className="text-sm font-medium text-muted-foreground">
-                    Total Cost
-                  </h3>
-                  <PieChart className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div className="text-2xl font-bold text-foreground">
-                  {formatCurrency(portfolioSummary.total_cost)}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Initial investment
-                </p>
+            <div className="glass-card p-6 group">
+              <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <h3 className="text-sm font-medium text-muted-foreground">
+                  Total Cost
+                </h3>
+                <PieChart className="h-4 w-4 text-muted-foreground" />
               </div>
+              <div className="text-2xl font-bold text-foreground">
+                {formatCurrency(portfolioSummary.total_cost)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Initial investment
+              </p>
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="relative">
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20 animate-pulse" />
-                <div className="relative p-6">
-                  <div className="h-4 bg-white/20 rounded w-1/2 mb-4"></div>
-                  <div className="h-8 bg-white/20 rounded w-3/4"></div>
-                </div>
+              <div key={i} className="glass-card p-6 animate-pulse">
+                <div className="h-4 bg-blue-300/20 dark:bg-white/20 rounded w-1/2 mb-4"></div>
+                <div className="h-8 bg-blue-300/20 dark:bg-white/20 rounded w-3/4"></div>
               </div>
             ))}
           </div>
         )}
 
-        {/* Performance and Actions with glass morphism */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Top Performers */}
-          <div className="relative">
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
-            <div className="relative p-6">
-              <div className="pb-4">
-                <h3 className="flex items-center text-lg font-semibold text-foreground">
-                  <TrendingUp className="h-5 w-5 mr-2 text-green-600" />
-                  Top Performers
-                </h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {hasHoldings
-                    ? "Your best performing assets"
-                    : "No holdings to display"}
-                </p>
-              </div>
-              <div className="space-y-3">
+          <div className="glass-card p-6">
+            <div className="pb-4">
+              <h3 className="flex items-center text-lg font-semibold text-foreground">
+                <TrendingUp className="h-5 w-5 mr-2 text-green-600" />
+                Top Performers
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                {hasHoldings
+                  ? "Your best performing assets"
+                  : "No holdings to display"}
+              </p>
+            </div>
+            <div className="space-y-3">
                 {topPerformers.length > 0 ? (
                   topPerformers.map((holding) => (
                     <div
                       key={holding.id}
-                      className="flex items-center justify-between p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all duration-200"
+                      className="glass-card-hover p-4 rounded-xl"
                     >
-                      <div>
-                        <p className="font-medium text-foreground">
-                          {holding.ticker}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {formatCurrency(holding.total_value)} •{" "}
-                          {holding.quantity} shares
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <Badge
-                          variant={
-                            holding.profit_loss_percentage >= 0
-                              ? "default"
-                              : "destructive"
-                          }
-                          className="text-xs bg-white/10 backdrop-blur-sm"
-                        >
-                          {formatPercentage(holding.profit_loss_percentage)}
-                        </Badge>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {formatCurrency(holding.profit_loss)}
-                        </p>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-foreground">
+                            {holding.ticker}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {formatCurrency(holding.total_value)} •{" "}
+                            {holding.quantity} shares
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <Badge
+                            variant={
+                              holding.profit_loss_percentage >= 0
+                                ? "default"
+                                : "destructive"
+                            }
+                            className="text-xs"
+                          >
+                            {formatPercentage(holding.profit_loss_percentage)}
+                          </Badge>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {formatCurrency(holding.profit_loss)}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -318,63 +299,60 @@ export const Dashboard: React.FC = () => {
                     <Briefcase className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
                     <p>Add some holdings to see performance</p>
                     <Button
-                      className="mt-3 bg-primary/20 backdrop-blur-sm border border-white/20 hover:bg-primary/30"
+                      className="mt-3"
                       onClick={() => navigate("/dashboard/holdings/add")}
                     >
                       Add Holding
                     </Button>
                   </div>
                 )}
-              </div>
             </div>
           </div>
 
           {/* Quick Actions */}
-          <div className="relative">
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
-            <div className="relative p-6">
-              <div className="pb-4">
-                <h3 className="text-lg font-semibold text-foreground">
-                  Quick Actions
-                </h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Manage your portfolio and get insights
-                </p>
-              </div>
-              <div className="space-y-3">
-                <Button
-                  className="w-full bg-primary/20 backdrop-blur-sm border border-white/20 hover:bg-primary/30 text-foreground"
-                  onClick={() => navigate("/dashboard/holdings/add")}
-                >
-                  <DollarSign className="h-4 w-4 mr-2" />
-                  Add New Holding
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="w-full bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 text-foreground"
-                  onClick={() => navigate("/dashboard/insights")}
-                  disabled={!hasHoldings}
-                >
-                  <TrendingUp className="h-4 w-4 mr-2" />
-                  Generate AI Insights
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="w-full bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 text-foreground"
-                  onClick={() => navigate("/dashboard/risk")}
-                  disabled={!hasHoldings}
-                >
-                  <AlertCircle className="h-4 w-4 mr-2" />
-                  View Risk Analysis
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full bg-transparent backdrop-blur-sm border border-white/20 hover:bg-white/5 text-foreground"
-                  onClick={() => navigate("/dashboard/holdings")}
-                >
-                  <Briefcase className="h-4 w-4 mr-2" />
-                  Manage Holdings
-                </Button>
+          <div className="glass-card p-6">
+            <div className="pb-4">
+              <h3 className="text-lg font-semibold text-foreground">
+                Quick Actions
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Manage your portfolio and get insights
+              </p>
+            </div>
+            <div className="space-y-3">
+              <Button
+                className="w-full"
+                onClick={() => navigate("/dashboard/holdings/add")}
+              >
+                <DollarSign className="h-4 w-4 mr-2" />
+                Add New Holding
+              </Button>
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={() => navigate("/dashboard/insights")}
+                disabled={!hasHoldings}
+              >
+                <TrendingUp className="h-4 w-4 mr-2" />
+                Generate AI Insights
+              </Button>
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={() => navigate("/dashboard/risk")}
+                disabled={!hasHoldings}
+              >
+                <AlertCircle className="h-4 w-4 mr-2" />
+                View Risk Analysis
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => navigate("/dashboard/holdings")}
+              >
+                <Briefcase className="h-4 w-4 mr-2" />
+                Manage Holdings
+              </Button>
               </div>
             </div>
           </div>
@@ -384,7 +362,7 @@ export const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* AI Insights Preview */}
           <div className="relative">
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-600/10 to-blue-800/5 dark:from-white/10 dark:to-white/5 backdrop-blur-sm border border-blue-200/20 dark:border-white/20" />
             <div className="relative p-6">
               <div className="pb-4">
                 <h3 className="text-lg font-semibold text-foreground">
@@ -420,7 +398,7 @@ export const Dashboard: React.FC = () => {
 
                     {/* Portfolio Performance Summary */}
                     {portfolioSummary && (
-                      <div className="p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+                      <div className="p-4 rounded-xl bg-blue-500/10 dark:bg-white/5 backdrop-blur-sm border border-blue-200/20 dark:border-white/10">
                         <p className="text-sm font-medium text-foreground">
                           Portfolio Performance
                         </p>
@@ -444,7 +422,7 @@ export const Dashboard: React.FC = () => {
                       .map((rec, index) => (
                         <div
                           key={index}
-                          className="text-sm text-muted-foreground p-3 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10"
+                          className="text-sm text-muted-foreground p-3 bg-blue-500/10 dark:bg-white/5 backdrop-blur-sm rounded-xl border border-blue-200/20 dark:border-white/10"
                         >
                           • {rec}
                         </div>
@@ -453,7 +431,7 @@ export const Dashboard: React.FC = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-full mt-3 bg-transparent backdrop-blur-sm border border-white/20 hover:bg-white/5 text-foreground"
+                      className="w-full mt-3 bg-transparent backdrop-blur-sm border border-blue-200/20 dark:border-white/20 hover:bg-blue-500/10 dark:hover:bg-white/5 text-foreground"
                       onClick={() => navigate("/dashboard/insights")}
                     >
                       View Full Insights
@@ -465,7 +443,7 @@ export const Dashboard: React.FC = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="bg-transparent backdrop-blur-sm border border-white/20 hover:bg-white/5 text-foreground"
+                      className="bg-transparent backdrop-blur-sm border border-blue-200/20 dark:border-white/20 hover:bg-blue-500/10 dark:hover:bg-white/5 text-foreground"
                       onClick={() => navigate("/dashboard/insights")}
                     >
                       Generate Insights
@@ -482,7 +460,7 @@ export const Dashboard: React.FC = () => {
 
           {/* Portfolio at a Glance */}
           <div className="relative">
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20" />
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-600/10 to-blue-800/5 dark:from-white/10 dark:to-white/5 backdrop-blur-sm border border-blue-200/20 dark:border-white/20" />
             <div className="relative p-6">
               <div className="pb-4">
                 <h3 className="text-lg font-semibold text-foreground">
@@ -551,7 +529,7 @@ export const Dashboard: React.FC = () => {
                             .map(([sector, percentage]: [string, number]) => (
                               <div
                                 key={sector}
-                                className="flex justify-between items-center text-sm p-2 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10"
+                                className="flex justify-between items-center text-sm p-2 rounded-lg bg-blue-500/10 dark:bg-white/5 backdrop-blur-sm border border-blue-200/20 dark:border-white/10"
                               >
                                 <span className="text-muted-foreground">
                                   {sector}
@@ -568,7 +546,7 @@ export const Dashboard: React.FC = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="w-full bg-transparent backdrop-blur-sm border border-white/20 hover:bg-white/5 text-foreground"
+                        className="w-full bg-transparent backdrop-blur-sm border border-blue-200/20 dark:border-white/20 hover:bg-blue-500/10 dark:hover:bg-white/5 text-foreground"
                         onClick={() => navigate("/dashboard/holdings")}
                       >
                         View All Holdings
@@ -580,7 +558,7 @@ export const Dashboard: React.FC = () => {
                     <PieChart className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
                     <p className="mb-3">Start building your portfolio</p>
                     <Button
-                      className="bg-primary/20 backdrop-blur-sm border border-white/20 hover:bg-primary/30 text-foreground"
+                      className="bg-blue-600/20 dark:bg-primary/20 backdrop-blur-sm border border-blue-200/20 dark:border-white/20 hover:bg-blue-600/30 dark:hover:bg-primary/30 text-foreground"
                       onClick={() => navigate("/dashboard/holdings/add")}
                     >
                       Add First Holding
@@ -592,6 +570,6 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+
   );
 };

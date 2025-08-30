@@ -94,115 +94,96 @@ export const Insights: React.FC = () => {
     return (
       <div className="space-y-6">
         {/* Header Skeleton */}
-        <div className="relative">
-          <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
-          <div className="relative p-6 flex justify-between items-center">
-            <div>
-              <div className="h-8 w-48 bg-gradient-to-r from-white/10 to-white/5 rounded-lg animate-pulse" />
-              <div className="h-4 w-64 bg-gradient-to-r from-white/10 to-white/5 rounded-lg animate-pulse mt-2" />
-            </div>
-            <div className="h-10 w-40 bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" />
+        <div className="glass-card p-6 flex justify-between items-center">
+          <div>
+            <div className="h-8 w-48 bg-gradient-to-r from-white/10 to-white/5 rounded-lg animate-pulse" />
+            <div className="h-4 w-64 bg-gradient-to-r from-white/10 to-white/5 rounded-lg animate-pulse mt-2" />
           </div>
+          <div className="h-10 w-40 bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" />
         </div>
 
         {/* Risk Analysis Skeleton */}
-        <div className="relative">
-          <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
-          <div className="relative p-6 space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="h-5 w-5 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-              <div className="h-6 w-32 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-            </div>
-            <div className="h-4 w-48 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-
-            <div className="flex items-center justify-between pt-4">
-              <div className="space-y-2">
-                <div className="h-4 w-16 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-                <div className="h-6 w-20 bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" />
-              </div>
-              <div className="text-right space-y-2">
-                <div className="h-4 w-20 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-                <div className="h-8 w-16 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-              </div>
-            </div>
-
-            <div className="h-2 w-full bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" />
+        <div className="glass-card p-6 space-y-4">
+          <div className="flex items-center space-x-2">
+            <div className="h-5 w-5 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+            <div className="h-6 w-32 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
           </div>
+          <div className="h-4 w-48 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+
+          <div className="flex items-center justify-between pt-4">
+            <div className="space-y-2">
+              <div className="h-4 w-16 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+              <div className="h-6 w-20 bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" />
+            </div>
+            <div className="text-right space-y-2">
+              <div className="h-4 w-20 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+              <div className="h-8 w-16 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+            </div>
+          </div>
+
+          <div className="h-2 w-full bg-gradient-to-r from-white/10 to-white/5 rounded-full animate-pulse" />
         </div>
 
         {/* Key Recommendations Skeleton */}
-        <div className="relative">
-          <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
-          <div className="relative p-6 space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="h-5 w-5 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-              <div className="h-6 w-40 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-            </div>
-            <div className="h-4 w-56 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+        <div className="glass-card p-6 space-y-4">
+          <div className="flex items-center space-x-2">
+            <div className="h-5 w-5 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+            <div className="h-6 w-40 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+          </div>
+          <div className="h-4 w-56 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
 
-            <div className="space-y-3 pt-4">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="flex items-start space-x-3 p-4 rounded-lg bg-white/5 border border-white/10"
-                >
-                  <div className="h-5 w-5 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse mt-0.5" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 w-32 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-                    <div className="h-4 w-full bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-                    <div className="h-4 w-3/4 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-                  </div>
+          <div className="space-y-3 pt-4">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="flex items-start space-x-3 p-4 rounded-lg bg-white/5 border border-white/10"
+              >
+                <div className="h-5 w-5 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse mt-0.5" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-32 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+                  <div className="h-4 w-full bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+                  <div className="h-4 w-3/4 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Additional Cards Skeleton */}
         <div className="grid gap-6 md:grid-cols-2">
           {[1, 2].map((i) => (
-            <div key={i} className="relative">
-              <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
-              <div className="relative p-6 space-y-4">
-                <div className="flex items-center space-x-2">
-                  <div className="h-5 w-5 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-                  <div className="h-6 w-32 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-                </div>
-                <div className="h-4 w-40 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+            <div key={i} className="glass-card p-6 space-y-4">
+              <div className="flex items-center space-x-2">
+                <div className="h-5 w-5 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+                <div className="h-6 w-32 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+              </div>
+              <div className="h-4 w-40 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
 
-                <div className="space-y-3 pt-4">
-                  {[1, 2].map((j) => (
-                    <div
-                      key={j}
-                      className="p-3 rounded-lg bg-white/5 border border-white/10"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="h-4 w-24 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-                        <div className="h-4 w-16 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-                      </div>
-                      <div className="h-3 w-full bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
-                      <div className="h-3 w-2/3 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse mt-2" />
+              <div className="space-y-3 pt-4">
+                {[1, 2].map((j) => (
+                  <div
+                    key={j}
+                    className="p-3 rounded-lg bg-white/5 border border-white/10"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="h-4 w-24 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+                      <div className="h-4 w-16 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
                     </div>
-                  ))}
-                </div>
+                    <div className="h-3 w-full bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse" />
+                    <div className="h-3 w-2/3 bg-gradient-to-r from-white/10 to-white/5 rounded animate-pulse mt-2" />
+                  </div>
+                ))}
               </div>
             </div>
           ))}
         </div>
 
         {/* Loading Indicator */}
-        <div className="relative">
-          <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
-          <div className="relative p-6 flex items-center justify-center">
-            <div className="flex items-center space-x-3">
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
-              <span className="text-muted-foreground font-medium">
-                {isGenerating
-                  ? "Analyzing your portfolio with AI..."
-                  : "Loading insights..."}
-              </span>
-            </div>
-          </div>
+        <div className="glass-card p-6 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-2 text-muted-foreground">
+            Generating insights...
+          </span>
         </div>
       </div>
     );
@@ -268,38 +249,35 @@ export const Insights: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="relative">
-        <div className="absolute inset-0 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10" />
-        <div className="relative p-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-semibold text-foreground">
-              AI Insights
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              AI-powered portfolio analysis
-            </p>
-          </div>
-          <Button
-            onClick={handleGenerateInsights}
-            disabled={isGenerating}
-            className="flex items-center space-x-2"
-          >
-            {isGenerating ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4 w-4" />
-            )}
-            <span>
-              {isGenerating ? "Generating..." : "Generate New Insights"}
-            </span>
-          </Button>
+      <div className="glass-card p-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-semibold text-foreground">
+            AI Insights
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            AI-powered portfolio analysis
+          </p>
         </div>
+        <Button
+          onClick={handleGenerateInsights}
+          disabled={isGenerating}
+          className="flex items-center space-x-2"
+        >
+          {isGenerating ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <RefreshCw className="h-4 w-4" />
+          )}
+          <span>
+            {isGenerating ? "Generating..." : "Generate New Insights"}
+          </span>
+        </Button>
       </div>
 
       {insights ? (
         <>
           {/* Risk Summary */}
-          <Card>
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle className="flex items-center">
                 {getRiskIcon(
@@ -375,7 +353,7 @@ export const Insights: React.FC = () => {
           </Card>
 
           {/* Key Recommendations */}
-          <Card>
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Lightbulb className="h-5 w-5 mr-2" />
@@ -419,7 +397,7 @@ export const Insights: React.FC = () => {
           {/* Concentration Alerts */}
           {insights.insight?.concentration_alerts &&
             insights.insight.concentration_alerts.length > 0 && (
-              <Card>
+              <Card className="glass-card">
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <AlertTriangle className="h-5 w-5 mr-2 text-orange-600" />
@@ -478,7 +456,7 @@ export const Insights: React.FC = () => {
           {/* Diversification Suggestions */}
           {insights.insight?.diversification_suggestions &&
             insights.insight.diversification_suggestions.length > 0 && (
-              <Card>
+              <Card className="glass-card">
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <TrendingUp className="h-5 w-5 mr-2 text-green-600" />
@@ -543,7 +521,7 @@ export const Insights: React.FC = () => {
             )}
 
           {/* Insight Metadata */}
-          <Card>
+          <Card className="glass-card">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between text-sm text-gray-500">
                 <div>
@@ -571,7 +549,7 @@ export const Insights: React.FC = () => {
         </>
       ) : (
         /* No insights available */
-        <Card>
+        <Card className="glass-card">
           <CardContent className="text-center py-12">
             <Lightbulb className="h-16 w-16 mx-auto mb-4 text-gray-300" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">

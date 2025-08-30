@@ -164,23 +164,25 @@ export const AddHoldingPage: React.FC = () => {
                       <FormLabel className="text-foreground">
                         Asset Type
                       </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
                           <SelectTrigger className="bg-white/5 backdrop-blur-sm border border-white/20 text-foreground">
                             <SelectValue placeholder="Select asset type" />
                           </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-background/95 backdrop-blur-sm border border-white/20">
-                          <SelectItem value="stock">Stock</SelectItem>
-                          <SelectItem value="etf">ETF</SelectItem>
-                          <SelectItem value="crypto">Cryptocurrency</SelectItem>
-                          <SelectItem value="bond">Bond</SelectItem>
-                          <SelectItem value="commodity">Commodity</SelectItem>
-                        </SelectContent>
-                      </Select>
+                          <SelectContent className="bg-background/95 backdrop-blur-sm border border-white/20">
+                            <SelectItem value="stock">Stock</SelectItem>
+                            <SelectItem value="etf">ETF</SelectItem>
+                            <SelectItem value="crypto">
+                              Cryptocurrency
+                            </SelectItem>
+                            <SelectItem value="bond">Bond</SelectItem>
+                            <SelectItem value="commodity">Commodity</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

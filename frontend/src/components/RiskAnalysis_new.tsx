@@ -174,7 +174,7 @@ export const RiskAnalysis: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div>
+      <div className="glass-card p-6">
         <h1 className="text-2xl font-bold text-gray-900">Risk Analysis</h1>
         <p className="text-gray-600">Comprehensive portfolio risk assessment</p>
       </div>

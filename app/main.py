@@ -9,6 +9,7 @@ from app.api.auth import router as auth_router
 from app.api.risk import router as risk_router
 from app.api.stocks import router as stocks_router
 from app.api.charts import router as charts_router
+from app.api.news import router as news_router
 from app.config import settings
 from app.services.startup import startup_service
 from app.services.bulk_price_service import bulk_price_service
@@ -75,6 +76,7 @@ app.include_router(
 app.include_router(
     charts_router, prefix=f"{settings.API_V1_STR}/charts", tags=["charts"]
 )
+app.include_router(news_router, prefix=f"{settings.API_V1_STR}/news", tags=["news"])
 
 
 @app.get("/")

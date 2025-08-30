@@ -16,9 +16,9 @@ celery.conf.update(
 
 # --- Celery Beat Schedule for Periodic Tasks ---
 celery.conf.beat_schedule = {
-    "fetch-and-cache-bulk-prices-every-24h": {
+    "fetch-and-cache-bulk-prices-every-1h": {
         "task": "fetch_and_cache_bulk_prices",
-        "schedule": 60 * 60 * 24,  # every 24 hours
+        "schedule": 60 * 60,  # every 1 hour instead of 24 hours
     },
 }
 

@@ -35,10 +35,8 @@ export const RiskAnalysis: React.FC = () => {
     error: riskMetricsError,
   } = useRiskMetrics();
 
-  const {
-    data: portfolioSummary,
-    isLoading: portfolioLoading,
-  } = usePortfolioSummary();
+  const { data: portfolioSummary, isLoading: portfolioLoading } =
+    usePortfolioSummary();
 
   const hasHoldings = portfolioSummary && portfolioSummary.holdings_count > 0;
   const loading = riskAnalysisLoading || riskMetricsLoading || portfolioLoading;
@@ -174,15 +172,24 @@ export const RiskAnalysis: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ">
       {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Risk Analysis</h1>
-        <p className="text-gray-600">Comprehensive portfolio risk assessment</p>
+      <div className="relative glass-card">
+        <div className="relative p-6 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-semibold text-foreground">
+              Risk Analysis
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Analyze your portfolio's risk exposure and get actionable
+              insights.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Overall Risk Score */}
-      <Card>
+      <Card className="glass-card">
         <CardHeader>
           <CardTitle className="flex items-center">
             <Shield className="h-5 w-5 mr-2" />
@@ -215,36 +222,36 @@ export const RiskAnalysis: React.FC = () => {
       </Card>
 
       {/* Risk Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ">
+        <Card className="glass-card">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Concentration Risk</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Concentration Risk
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {((riskData.herfindahl_index || 0) * 100).toFixed(1)}%
             </div>
-            <p className="text-xs text-muted-foreground">
-              Herfindahl Index
-            </p>
+            <p className="text-xs text-muted-foreground">Herfindahl Index</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-card">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Diversification</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Diversification
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {(riskData.effective_number_of_holdings || 0).toFixed(1)}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Effective holdings
-            </p>
+            <p className="text-xs text-muted-foreground">Effective holdings</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-card">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium">Max Position</CardTitle>
           </CardHeader>
@@ -252,13 +259,11 @@ export const RiskAnalysis: React.FC = () => {
             <div className="text-2xl font-bold">
               {((riskData.max_position_weight || 0) * 100).toFixed(1)}%
             </div>
-            <p className="text-xs text-muted-foreground">
-              Largest holding
-            </p>
+            <p className="text-xs text-muted-foreground">Largest holding</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="glass-card">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium">Value at Risk</CardTitle>
           </CardHeader>
@@ -275,7 +280,7 @@ export const RiskAnalysis: React.FC = () => {
 
       {/* Sector Risk Breakdown */}
       {riskData.sectors && riskData.sectors.length > 0 && (
-        <Card>
+        <Card className="glass-card">
           <CardHeader>
             <CardTitle className="flex items-center">
               <BarChart className="h-5 w-5 mr-2" />
@@ -300,7 +305,9 @@ export const RiskAnalysis: React.FC = () => {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className={`h-2 rounded-full ${getRiskColor(sector.risk_level)}`}
+                      className={`h-2 rounded-full ${getRiskColor(
+                        sector.risk_level
+                      )}`}
                       style={{ width: `${sector.percentage}%` }}
                     ></div>
                   </div>
@@ -313,7 +320,7 @@ export const RiskAnalysis: React.FC = () => {
 
       {/* Geographic Risk */}
       {riskData.countries && riskData.countries.length > 0 && (
-        <Card>
+        <Card className="glass-card">
           <CardHeader>
             <CardTitle className="flex items-center">
               <AlertTriangle className="h-5 w-5 mr-2" />
@@ -338,7 +345,9 @@ export const RiskAnalysis: React.FC = () => {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className={`h-2 rounded-full ${getRiskColor(country.risk_level)}`}
+                      className={`h-2 rounded-full ${getRiskColor(
+                        country.risk_level
+                      )}`}
                       style={{ width: `${country.percentage}%` }}
                     ></div>
                   </div>
@@ -350,7 +359,7 @@ export const RiskAnalysis: React.FC = () => {
       )}
 
       {/* Risk Warnings */}
-      <Card>
+      <Card className="glass-card">
         <CardHeader>
           <CardTitle className="flex items-center text-orange-600">
             <AlertTriangle className="h-5 w-5 mr-2" />
@@ -362,21 +371,25 @@ export const RiskAnalysis: React.FC = () => {
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                High concentration in technology sector may increase volatility during market downturns.
+                High concentration in technology sector may increase volatility
+                during market downturns.
               </AlertDescription>
             </Alert>
-            
+
             <Alert>
               <TrendingDown className="h-4 w-4" />
               <AlertDescription>
-                Consider diversifying across more sectors and geographies to reduce overall portfolio risk.
+                Consider diversifying across more sectors and geographies to
+                reduce overall portfolio risk.
               </AlertDescription>
             </Alert>
-            
+
             <Alert>
               <Shield className="h-4 w-4" />
               <AlertDescription>
-                Portfolio volatility of {((riskData.portfolio_volatility || 0) * 100).toFixed(1)}% suggests moderate risk exposure.
+                Portfolio volatility of{" "}
+                {((riskData.portfolio_volatility || 0) * 100).toFixed(1)}%
+                suggests moderate risk exposure.
               </AlertDescription>
             </Alert>
           </div>

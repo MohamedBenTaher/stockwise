@@ -21,3 +21,4 @@ class User(Base):
 
     # Relationships
     holdings = relationship("Holding", back_populates="user")
+    bookmarks = relationship("Bookmark", back_populates="user")
