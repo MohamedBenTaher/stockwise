@@ -218,6 +218,13 @@ class BulkPriceService:
             if not redis_client:
                 return True  # No Redis, always fetch
 
+            # Check if a fetch is already in progress
+            fetch_lock_key = "bulk_fetch:lock"
+            is_locked = await redis_client.get(fetch_lock_key)
+            if is_locked:
+                logger.info("🔒 Bulk fetch already in progress, skipping...")
+                return False
+
             last_fetch_str = await redis_client.get(self.last_bulk_fetch_key)
             if not last_fetch_str:
                 return True  # Never fetched before
@@ -231,11 +238,65 @@ class BulkPriceService:
             logger.warning(f"Error checking bulk fetch status: {e}")
             return True
 
+    async def acquire_fetch_lock(self) -> bool:
+        """Acquire a lock to prevent concurrent fetches."""
+        try:
+            redis_client = await self.get_redis()
+            if not redis_client:
+                return True  # No Redis, proceed
+
+            fetch_lock_key = "bulk_fetch:lock"
+            # Set lock with 10 minute expiration
+            lock_acquired = await redis_client.set(
+                fetch_lock_key, "locked", ex=600, nx=True
+            )
+
+            if lock_acquired:
+                logger.info("🔒 Acquired bulk fetch lock")
+                return True
+            else:
+                logger.info("⏭️  Bulk fetch lock already held, skipping...")
+                return False
+
+        except Exception as e:
+            logger.warning(f"Failed to acquire fetch lock: {e}")
+            return True  # Proceed if we can't check
+
+    async def release_fetch_lock(self):
+        """Release the fetch lock."""
+        try:
+            redis_client = await self.get_redis()
+            if redis_client:
+                fetch_lock_key = "bulk_fetch:lock"
+                await redis_client.delete(fetch_lock_key)
+                logger.info("🔓 Released bulk fetch lock")
+        except Exception as e:
+            logger.warning(f"Failed to release fetch lock: {e}")
+
     async def fetch_bulk_prices_safe(self) -> Dict[str, float]:
         """SAFE bulk price fetch with strict rate limiting and error handling."""
         logger.info(
             f"🚀 Starting SAFE bulk price fetch for {len(self.all_assets)} assets"
         )
+
+        # Check if we should fetch and acquire lock
+        if not await self.should_fetch_bulk_data():
+            logger.info("⏭️  Bulk fetch not needed, using cached data")
+            cached_prices = await self.get_cached_prices()
+            if cached_prices:
+                return cached_prices
+
+        # Try to acquire lock to prevent concurrent fetches
+        if not await self.acquire_fetch_lock():
+            logger.info("⏭️  Another fetch in progress, using cached/fallback data")
+            cached_prices = await self.get_cached_prices()
+            if cached_prices:
+                return cached_prices
+            # Return fallbacks if no cache available
+            return {
+                asset: self.fallback_prices.get(asset, 100.0)
+                for asset in self.all_assets
+            }
 
         try:
             bulk_prices = {}
@@ -259,9 +320,12 @@ class BulkPriceService:
                 asset: self.fallback_prices.get(asset, 100.0)
                 for asset in self.all_assets
             }
+        finally:
+            # Always release the lock
+            await self.release_fetch_lock()
 
     async def _fetch_limited_live_prices(self) -> Dict[str, float]:
-        """Fetch limited live prices with strict rate limiting."""
+        """Fetch limited live prices with Alpha Vantage first strategy."""
         live_prices = {}
 
         # Priority assets for live fetching (limit to prevent rate limiting)
@@ -278,43 +342,47 @@ class BulkPriceService:
             "VTI",
         ]
 
-        # Limit to 20 assets max for live fetching
+        # Limit to 10 assets max for Alpha Vantage (respect rate limits)
         fetch_assets = [asset for asset in priority_assets if asset in self.all_assets][
-            :20
+            :10
         ]
 
         if not fetch_assets:
             return live_prices
 
-        # Try yfinance first (more reliable for bulk)
-        yf_prices = await self._fetch_yfinance_limited(fetch_assets)
-        if yf_prices:
-            live_prices.update(yf_prices)
-
-        # Only use Alpha Vantage for critical missing assets (max 5)
-        missing_assets = [
-            asset for asset in fetch_assets[:5] if asset not in live_prices
-        ]
-        if missing_assets and settings.ALPHA_VANTAGE_API_KEY:
-            av_prices = await self._fetch_alpha_vantage_limited(missing_assets)
+        # Use Alpha Vantage first (more reliable currently)
+        if settings.ALPHA_VANTAGE_API_KEY:
+            logger.info(f"📈 Fetching {len(fetch_assets)} assets via Alpha Vantage")
+            av_prices = await self._fetch_alpha_vantage_limited(fetch_assets)
             if av_prices:
                 live_prices.update(av_prices)
+                logger.info(f"✅ Alpha Vantage fetched: {len(av_prices)} prices")
+
+        # Fill remaining with fallback values
+        for asset in fetch_assets:
+            if asset not in live_prices:
+                live_prices[asset] = self.fallback_prices.get(asset, 100.0)
+                logger.debug(f"Using fallback for {asset}: ${live_prices[asset]}")
 
         return live_prices
 
     async def _fetch_yfinance_limited(self, assets: List[str]) -> Dict[str, float]:
-        """Fetch from yfinance with error handling."""
+        """Fetch from yfinance with error handling and timeout."""
         try:
             logger.info(f"📊 Fetching {len(assets)} assets via yfinance...")
 
-            # Single batch request to avoid overwhelming yfinance
-            loop = asyncio.get_event_loop()
-            prices = await loop.run_in_executor(
-                None, self._fetch_yfinance_chunk_safe, assets
-            )
-
-            logger.info(f"✅ yfinance fetch completed: {len(prices)} prices")
-            return prices
+            # Use asyncio timeout to prevent hanging
+            try:
+                loop = asyncio.get_event_loop()
+                prices = await asyncio.wait_for(
+                    loop.run_in_executor(None, self._fetch_yfinance_chunk_safe, assets),
+                    timeout=30.0,  # 30 second timeout
+                )
+                logger.info(f"✅ yfinance fetch completed: {len(prices)} prices")
+                return prices
+            except asyncio.TimeoutError:
+                logger.warning("⏰ yfinance fetch timed out after 30 seconds")
+                return {}
 
         except Exception as e:
             logger.warning(f"⚠️ yfinance limited fetch failed: {e}")
@@ -328,66 +396,25 @@ class BulkPriceService:
             if not tickers:
                 return {}
 
-            # Use space-separated tickers for bulk request
-            tickers_str = " ".join(tickers)
-            logger.debug(f"Requesting yfinance data for: {tickers_str}")
-
-            # Download with minimal period to reduce data transfer
-            data = yf.download(
-                tickers_str,
-                period="1d",
-                interval="1d",
-                progress=False,
-                show_errors=False,
-                threads=True,
-                timeout=30,
-            )
-
             prices = {}
 
-            if data.empty:
-                logger.warning(f"yfinance returned empty DataFrame for: {tickers_str}")
-                return prices
+            # Use individual ticker approach for better reliability
+            for ticker in tickers:
+                try:
+                    yf_ticker = yf.Ticker(ticker)
+                    hist = yf_ticker.history(period="1d")
 
-            # Handle single vs multiple tickers
-            if len(tickers) == 1:
-                # Single ticker response
-                if "Close" in data.columns and not data["Close"].empty:
-                    try:
-                        latest_close = data["Close"].dropna().iloc[-1]
+                    if not hist.empty and "Close" in hist.columns:
+                        latest_close = hist["Close"].iloc[-1]
                         if pd.notna(latest_close) and latest_close > 0:
-                            prices[tickers[0]] = float(latest_close)
-                            logger.debug(
-                                f"Single ticker {tickers[0]}: {prices[tickers[0]]}"
-                            )
-                    except Exception as e:
-                        logger.debug(
-                            f"Failed to extract single ticker {tickers[0]}: {e}"
-                        )
-            else:
-                # Multiple tickers response - expect MultiIndex columns
-                if "Close" in data.columns:
-                    close_data = data["Close"]
+                            prices[ticker] = float(latest_close)
+                            logger.debug(f"yfinance {ticker}: ${prices[ticker]}")
+                    else:
+                        logger.debug(f"No data for {ticker} from yfinance")
 
-                    for ticker in tickers:
-                        try:
-                            if ticker in close_data.columns:
-                                ticker_data = close_data[ticker].dropna()
-                                if not ticker_data.empty:
-                                    latest_price = ticker_data.iloc[-1]
-                                    if pd.notna(latest_price) and latest_price > 0:
-                                        prices[ticker] = float(latest_price)
-                                        logger.debug(
-                                            f"Multi ticker {ticker}: "
-                                            f"{prices[ticker]}"
-                                        )
-                            else:
-                                logger.debug(
-                                    f"Ticker {ticker} not found in columns: "
-                                    f"{list(close_data.columns)}"
-                                )
-                        except Exception as e:
-                            logger.debug(f"Failed to extract price for {ticker}: {e}")
+                except Exception as e:
+                    logger.debug(f"Failed to fetch {ticker} from yfinance: {e}")
+                    continue
 
             logger.info(
                 f"yfinance extracted {len(prices)} valid prices "
