@@ -43,8 +43,8 @@ class Settings(BaseSettings):
     # External API Keys
     GROQ_API_KEY: Optional[str] = None  # Free Groq API for AI
     HUGGINGFACE_API_KEY: Optional[str] = None  # Free HF API fallback
-    GROQ_API_KEY: Optional[str] = None
     ALPHA_VANTAGE_API_KEY: Optional[str] = None
+    NEWS_API_KEY: Optional[str] = None  # NewsAPI for news articles
     FINANCIAL_MODELING_PREP_API_KEY: Optional[str] = None
 
     # OAuth Configuration

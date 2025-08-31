@@ -231,242 +231,293 @@ class BulkPriceService:
             logger.warning(f"Error checking bulk fetch status: {e}")
             return True
 
-    async def fetch_bulk_prices(self) -> Dict[str, float]:
-        """Fetch prices for all assets in bulk."""
-        logger.info(f"🚀 Starting bulk price fetch for {len(self.all_assets)} assets")
+    async def fetch_bulk_prices_safe(self) -> Dict[str, float]:
+        """SAFE bulk price fetch with strict rate limiting and error handling."""
+        logger.info(
+            f"🚀 Starting SAFE bulk price fetch for {len(self.all_assets)} assets"
+        )
 
         try:
-            # Try different bulk fetching strategies
             bulk_prices = {}
 
-            # Strategy 1: Try Alpha Vantage batch (if available)
-            if settings.ALPHA_VANTAGE_API_KEY:
-                av_prices = await self._fetch_alpha_vantage_batch()
-                if av_prices:
-                    bulk_prices.update(av_prices)
-
-            # Strategy 2: Try yfinance bulk (fallback)
-            if len(bulk_prices) < len(self.all_assets) * 0.8:  # Less than 80% success
-                yf_prices = await self._fetch_yfinance_batch()
-                bulk_prices.update(yf_prices)
-
-            # Strategy 3: Fill remaining with fallback prices
+            # Always start with fallback prices as base
             for asset in self.all_assets:
-                if asset not in bulk_prices:
-                    bulk_prices[asset] = self.fallback_prices.get(asset, 100.0)
+                bulk_prices[asset] = self.fallback_prices.get(asset, 100.0)
 
-            logger.info(f"✅ Bulk fetch completed: {len(bulk_prices)} prices fetched")
+            # Try to enhance with live data (with strict limits)
+            live_prices = await self._fetch_limited_live_prices()
+            if live_prices:
+                bulk_prices.update(live_prices)
+                logger.info(f"📈 Enhanced {len(live_prices)} prices with live data")
+
+            logger.info(f"✅ SAFE bulk fetch completed: {len(bulk_prices)} prices")
             return bulk_prices
 
         except Exception as e:
-            logger.error(f"❌ Bulk price fetch failed: {e}")
+            logger.error(f"❌ SAFE bulk fetch failed, using fallbacks: {e}")
             return {
                 asset: self.fallback_prices.get(asset, 100.0)
                 for asset in self.all_assets
             }
 
-    async def _fetch_yfinance_batch(self) -> Dict[str, float]:
-        """Fetch prices using yfinance in true bulk mode."""
+    async def _fetch_limited_live_prices(self) -> Dict[str, float]:
+        """Fetch limited live prices with strict rate limiting."""
+        live_prices = {}
+
+        # Priority assets for live fetching (limit to prevent rate limiting)
+        priority_assets = [
+            "AAPL",
+            "MSFT",
+            "GOOGL",
+            "AMZN",
+            "NVDA",
+            "TSLA",
+            "META",
+            "SPY",
+            "QQQ",
+            "VTI",
+        ]
+
+        # Limit to 20 assets max for live fetching
+        fetch_assets = [asset for asset in priority_assets if asset in self.all_assets][
+            :20
+        ]
+
+        if not fetch_assets:
+            return live_prices
+
+        # Try yfinance first (more reliable for bulk)
+        yf_prices = await self._fetch_yfinance_limited(fetch_assets)
+        if yf_prices:
+            live_prices.update(yf_prices)
+
+        # Only use Alpha Vantage for critical missing assets (max 5)
+        missing_assets = [
+            asset for asset in fetch_assets[:5] if asset not in live_prices
+        ]
+        if missing_assets and settings.ALPHA_VANTAGE_API_KEY:
+            av_prices = await self._fetch_alpha_vantage_limited(missing_assets)
+            if av_prices:
+                live_prices.update(av_prices)
+
+        return live_prices
+
+    async def _fetch_yfinance_limited(self, assets: List[str]) -> Dict[str, float]:
+        """Fetch from yfinance with error handling."""
         try:
-            logger.info("📊 Fetching prices via yfinance bulk...")
+            logger.info(f"📊 Fetching {len(assets)} assets via yfinance...")
 
-            # yfinance can handle multiple tickers in one request
-            import yfinance as yf
+            # Single batch request to avoid overwhelming yfinance
+            loop = asyncio.get_event_loop()
+            prices = await loop.run_in_executor(
+                None, self._fetch_yfinance_chunk_safe, assets
+            )
 
-            # Split into chunks to avoid overwhelming yfinance
-            chunk_size = 50
-            all_prices = {}
-            asset_list = list(self.all_assets)
-
-            for i in range(0, len(asset_list), chunk_size):
-                chunk = asset_list[i : i + chunk_size]
-
-                try:
-                    # Use yfinance download for bulk fetching
-                    loop = asyncio.get_event_loop()
-                    chunk_data = await loop.run_in_executor(
-                        None, self._fetch_yfinance_chunk, chunk
-                    )
-
-                    if chunk_data:
-                        all_prices.update(chunk_data)
-
-                    logger.info(
-                        f"yfinance chunk {i//chunk_size + 1} completed: {len(chunk_data)} prices"
-                    )
-
-                    # Small delay between chunks
-                    if i + chunk_size < len(asset_list):
-                        await asyncio.sleep(2)
-
-                except Exception as e:
-                    logger.warning(f"yfinance chunk {i//chunk_size + 1} failed: {e}")
-
-            return all_prices
-
-        except Exception as e:
-            logger.warning(f"yfinance batch fetch failed: {e}")
-            return {}
-
-    async def _fetch_alpha_vantage_batch(self) -> Dict[str, float]:
-        """Fetch prices using Alpha Vantage in optimized batches."""
-        try:
-            if not settings.ALPHA_VANTAGE_API_KEY:
-                return {}
-
-            logger.info("📊 Fetching prices via Alpha Vantage batch...")
-            prices = {}
-
-            # Alpha Vantage doesn't have true batch API, but we can optimize
-            # Process in very small batches with delays to respect rate limits
-            asset_list = list(self.all_assets)
-            batch_size = 5  # Very conservative for free tier
-
-            for i in range(
-                0, min(50, len(asset_list)), batch_size
-            ):  # Limit to 50 assets max
-                batch = asset_list[i : i + batch_size]
-
-                # Concurrent requests within batch
-                tasks = [self._get_alpha_vantage_price(asset) for asset in batch]
-                results = await asyncio.gather(*tasks, return_exceptions=True)
-
-                for asset, price in zip(batch, results):
-                    if isinstance(price, Exception):
-                        logger.debug(f"Alpha Vantage failed for {asset}: {price}")
-                    elif price and price > 0:
-                        prices[asset] = price
-
-                # Rate limiting between batches
-                if i + batch_size < min(50, len(asset_list)):
-                    await asyncio.sleep(15)  # 15 seconds between batches
-
-                logger.info(
-                    f"Alpha Vantage batch {i//batch_size + 1} completed: {len(prices)} prices so far"
-                )
-
+            logger.info(f"✅ yfinance fetch completed: {len(prices)} prices")
             return prices
 
         except Exception as e:
-            logger.warning(f"Alpha Vantage batch fetch failed: {e}")
+            logger.warning(f"⚠️ yfinance limited fetch failed: {e}")
             return {}
 
-    async def _fetch_yfinance_batch(self) -> Dict[str, float]:
-        """Fetch prices using yfinance in true bulk mode."""
-        try:
-            logger.info("📊 Fetching prices via yfinance bulk...")
-
-            # yfinance can handle multiple tickers in one request
-            import yfinance as yf
-
-            # Split into chunks to avoid overwhelming yfinance
-            chunk_size = 50
-            all_prices = {}
-            asset_list = list(self.all_assets)
-
-            for i in range(0, len(asset_list), chunk_size):
-                chunk = asset_list[i : i + chunk_size]
-
-                try:
-                    # Use yfinance download for bulk fetching
-                    loop = asyncio.get_event_loop()
-                    chunk_data = await loop.run_in_executor(
-                        None, self._fetch_yfinance_chunk, chunk
-                    )
-
-                    if chunk_data:
-                        all_prices.update(chunk_data)
-
-                    logger.info(
-                        f"yfinance chunk {i//chunk_size + 1} completed: {len(chunk_data)} prices"
-                    )
-
-                    # Small delay between chunks
-                    if i + chunk_size < len(asset_list):
-                        await asyncio.sleep(2)
-
-                except Exception as e:
-                    logger.warning(f"yfinance chunk {i//chunk_size + 1} failed: {e}")
-
-            return all_prices
-
-        except Exception as e:
-            logger.warning(f"yfinance batch fetch failed: {e}")
-            return {}
-
-    def _fetch_yfinance_chunk(self, tickers: List[str]) -> Dict[str, float]:
-
+    def _fetch_yfinance_chunk_safe(self, tickers: List[str]) -> Dict[str, float]:
+        """Safe yfinance chunk fetching with comprehensive error handling."""
         import yfinance as yf
 
         try:
+            if not tickers:
+                return {}
+
+            # Use space-separated tickers for bulk request
             tickers_str = " ".join(tickers)
-            data = yf.download(tickers_str, period="1d", interval="1d", progress=False)
+            logger.debug(f"Requesting yfinance data for: {tickers_str}")
+
+            # Download with minimal period to reduce data transfer
+            data = yf.download(
+                tickers_str,
+                period="1d",
+                interval="1d",
+                progress=False,
+                show_errors=False,
+                threads=True,
+                timeout=30,
+            )
+
             prices = {}
 
             if data.empty:
                 logger.warning(f"yfinance returned empty DataFrame for: {tickers_str}")
-            else:
-                logger.debug(f"yfinance DataFrame for {tickers_str}:\n{data}")
+                return prices
 
+            # Handle single vs multiple tickers
             if len(tickers) == 1:
-                if not data.empty and "Close" in data.columns:
-                    prices[tickers[0]] = float(data["Close"].iloc[-1])
+                # Single ticker response
+                if "Close" in data.columns and not data["Close"].empty:
+                    try:
+                        latest_close = data["Close"].dropna().iloc[-1]
+                        if pd.notna(latest_close) and latest_close > 0:
+                            prices[tickers[0]] = float(latest_close)
+                            logger.debug(
+                                f"Single ticker {tickers[0]}: {prices[tickers[0]]}"
+                            )
+                    except Exception as e:
+                        logger.debug(
+                            f"Failed to extract single ticker {tickers[0]}: {e}"
+                        )
             else:
-                if not data.empty and "Close" in data.columns:
+                # Multiple tickers response - expect MultiIndex columns
+                if "Close" in data.columns:
+                    close_data = data["Close"]
+
                     for ticker in tickers:
                         try:
-                            if ticker in data["Close"].columns:
-                                prices[ticker] = float(data["Close"][ticker].iloc[-1])
+                            if ticker in close_data.columns:
+                                ticker_data = close_data[ticker].dropna()
+                                if not ticker_data.empty:
+                                    latest_price = ticker_data.iloc[-1]
+                                    if pd.notna(latest_price) and latest_price > 0:
+                                        prices[ticker] = float(latest_price)
+                                        logger.debug(
+                                            f"Multi ticker {ticker}: "
+                                            f"{prices[ticker]}"
+                                        )
                             else:
-                                logger.warning(
-                                    f"Ticker {ticker} not in yfinance Close columns"
+                                logger.debug(
+                                    f"Ticker {ticker} not found in columns: "
+                                    f"{list(close_data.columns)}"
                                 )
                         except Exception as e:
                             logger.debug(f"Failed to extract price for {ticker}: {e}")
 
+            logger.info(
+                f"yfinance extracted {len(prices)} valid prices "
+                f"from {len(tickers)} requested"
+            )
             return prices
 
         except Exception as e:
             logger.error(f"yfinance chunk fetch failed for {tickers}: {e}")
             return {}
 
-    async def _get_alpha_vantage_price(self, ticker: str) -> Optional[float]:
+    async def _fetch_alpha_vantage_limited(self, assets: List[str]) -> Dict[str, float]:
+        """Fetch limited assets from Alpha Vantage with strict rate limiting."""
+        if not settings.ALPHA_VANTAGE_API_KEY:
+            return {}
+
         try:
-            if not settings.ALPHA_VANTAGE_API_KEY:
-                logger.debug("Alpha Vantage API key not set, skipping fetch")
-                return None
-            async with httpx.AsyncClient() as client:
+            logger.info(
+                f"📊 Fetching {len(assets)} critical assets via Alpha Vantage..."
+            )
+
+            prices = {}
+
+            # Process one by one with delays to respect rate limits
+            for i, asset in enumerate(assets):
+                try:
+                    price = await self._get_alpha_vantage_price_safe(asset)
+                    if price and price > 0:
+                        prices[asset] = price
+                        logger.debug(f"Alpha Vantage {asset}: {price}")
+
+                    # Rate limiting: wait between requests
+                    if i < len(assets) - 1:  # Don't wait after the last request
+                        await asyncio.sleep(12)  # 12 seconds = 5 requests per minute
+
+                except Exception as e:
+                    logger.warning(f"Alpha Vantage failed for {asset}: {e}")
+                    continue
+
+            logger.info(f"✅ Alpha Vantage limited fetch: {len(prices)} prices")
+            return prices
+
+        except Exception as e:
+            logger.warning(f"⚠️ Alpha Vantage limited fetch failed: {e}")
+            return {}
+
+    async def _get_alpha_vantage_price_safe(self, ticker: str) -> Optional[float]:
+        """Safe Alpha Vantage price fetch with timeout and error handling."""
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
                 params = {
                     "function": "GLOBAL_QUOTE",
                     "symbol": ticker.upper(),
                     "apikey": settings.ALPHA_VANTAGE_API_KEY,
                 }
+
                 response = await client.get(
-                    "https://www.alphavantage.co/query", params=params, timeout=5.0
+                    "https://www.alphavantage.co/query", params=params
                 )
-                logger.debug(
-                    f"Raw response for {ticker}: {response.text} (Status: {response.status_code})"
-                )
+
+                # Check for valid response
+                if response.status_code != 200:
+                    logger.warning(
+                        f"Alpha Vantage HTTP {response.status_code} for {ticker}"
+                    )
+                    return None
+
+                # Parse JSON safely
                 try:
                     data = response.json()
-                except Exception as e:
-                    logger.error(f"JSON decode error for {ticker}: {e}")
-                    logger.debug(f"Raw response content for {ticker}: {response.text}")
+                except Exception:
+                    logger.warning(f"Alpha Vantage invalid JSON for {ticker}")
                     return None
 
+                # Check for rate limit
                 if "Note" in data:
-                    logger.warning(f"Alpha Vantage rate limit hit: {data['Note']}")
+                    logger.warning(f"Alpha Vantage rate limit: {data['Note']}")
                     return None
 
+                # Check for error messages
+                if "Error Message" in data:
+                    logger.warning(
+                        f"Alpha Vantage error for {ticker}: {data['Error Message']}"
+                    )
+                    return None
+
+                # Extract price
                 if "Global Quote" in data:
                     quote = data["Global Quote"]
                     price_str = quote.get("05. price", "0")
                     if price_str and price_str != "0":
-                        return float(price_str)
-        except Exception as e:
-            logger.debug(f"Alpha Vantage single fetch failed for {ticker}: {e}")
+                        try:
+                            price = float(price_str)
+                            if price > 0:
+                                return price
+                        except ValueError:
+                            logger.warning(
+                                f"Invalid price format for {ticker}: {price_str}"
+                            )
 
-        return None
+                return None
+
+        except asyncio.TimeoutError:
+            logger.warning(f"Alpha Vantage timeout for {ticker}")
+            return None
+        except Exception as e:
+            logger.debug(f"Alpha Vantage error for {ticker}: {e}")
+            return None
+
+    async def _fetch_yfinance_batch(self) -> Dict[str, float]:
+        """Fetch prices using yfinance in true bulk mode (DEPRECATED - use limited version)."""
+        logger.warning(
+            "Using deprecated _fetch_yfinance_batch - use _fetch_yfinance_limited"
+        )
+        return {}
+
+    def _fetch_yfinance_chunk(self, tickers: List[str]) -> Dict[str, float]:
+        """DEPRECATED - use _fetch_yfinance_chunk_safe instead."""
+        logger.warning("Using deprecated _fetch_yfinance_chunk")
+        return {}
+
+    async def _fetch_alpha_vantage_batch(self) -> Dict[str, float]:
+        """DEPRECATED - use _fetch_alpha_vantage_limited instead."""
+        logger.warning("Using deprecated _fetch_alpha_vantage_batch")
+        return {}
+
+    async def _get_alpha_vantage_price(self, ticker: str) -> Optional[float]:
+        """DEPRECATED - use _get_alpha_vantage_price_safe instead."""
+        logger.warning("Using deprecated _get_alpha_vantage_price")
+        return await self._get_alpha_vantage_price_safe(ticker)
 
     async def cache_bulk_prices(self, prices: Dict[str, float]) -> bool:
         """Cache bulk prices in Redis."""
@@ -587,6 +638,10 @@ class BulkPriceService:
         """Get price for a single ticker from cache only."""
         prices = await self.get_prices([ticker])
         return prices.get(ticker, self.fallback_prices.get(ticker.upper(), 100.0))
+
+    async def get_multiple_prices(self, tickers: List[str]) -> Dict[str, float]:
+        """Alias for get_prices for compatibility."""
+        return await self.get_prices(tickers)
 
     async def warm_cache(self) -> bool:
         """Warm the cache by fetching all prices."""

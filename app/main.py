@@ -11,7 +11,6 @@ from app.api.stocks import router as stocks_router
 from app.api.charts import router as charts_router
 from app.api.news import router as news_router
 from app.config import settings
-from app.services.startup import startup_service
 from app.services.bulk_price_service import bulk_price_service
 import logging
 from app.celery import trigger_bulk_price_fetch
@@ -42,23 +41,24 @@ async def startup_event():
     logger_.info("🚀 Starting StockWise API...")
 
     try:
-        # Trigger background cache build (non-blocking)
-        logger_.info("Triggering Celery background price fetch...")
-        trigger_bulk_price_fetch()
-
-        # Optionally: preload only very fast, local data here
-        logger_.info("Preloading startup data (fast tasks only)...")
-        preload_success = await startup_service.preload_all_startup_data()
-        if preload_success:
-            logger_.info("✅ Startup data preload completed")
+        # Check if cache is already populated (don't block startup)
+        cached_prices = await bulk_price_service.get_cached_prices()
+        if cached_prices:
+            logger_.info(f"✅ Found {len(cached_prices)} cached prices, API ready")
         else:
-            logger_.warning("⚠️ Startup data preload failed")
+            logger_.info("📊 No cached prices found, triggering background fetch...")
+            # Non-blocking background trigger
+            trigger_bulk_price_fetch()
+
+        # Fast, non-blocking startup tasks only
+        logger_.info("⚡ Running fast startup tasks...")
+        # Add any other fast startup tasks here
 
         logger_.info("✅ StockWise API started successfully")
 
     except Exception as e:
-        logger_.error(f"❌ Startup failed: {e}")
-        # Don't fail startup completely, but log the error
+        logger_.error(f"❌ Startup warning: {e}")
+        # Don't fail startup completely, just log the error
 
 
 # Include routers

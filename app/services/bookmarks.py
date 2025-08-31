@@ -42,10 +42,10 @@ class BookmarkService:
             bookmark_data = BookmarkCreate(
                 article_id=article.id,
                 article_title=article.title,
-                article_url=article.url,
-                article_source=article.source,
-                article_summary=article.summary,
-                article_sentiment=article.sentiment,
+                article_url=str(article.url),
+                article_source=str(article.source),
+                article_summary=str(article.summary),
+                article_sentiment=str(article.sentiment),
                 article_published_at=(
                     datetime.fromisoformat(article.published_at.replace("Z", "+00:00"))
                     if isinstance(article.published_at, str)

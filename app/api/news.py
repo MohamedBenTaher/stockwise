@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from app.db import get_db
 from app.services.auth import get_current_user
-from app.services.news import news_service
+from app.services.news_optimized import optimized_news_service as news_service
 from app.services.holdings import HoldingService
 from app.services.bookmarks import BookmarkService
 from app.schemas.user import User

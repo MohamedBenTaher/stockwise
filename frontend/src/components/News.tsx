@@ -519,7 +519,19 @@ export const News: React.FC = () => {
                                         </Button>
                                       </DropdownMenuTrigger>
                                       <DropdownMenuContent align="end">
-                                        <DropdownMenuItem>
+                                        <DropdownMenuItem
+                                          onClick={() => {
+                                            console.log(
+                                              `Opening article: ${article.url}`
+                                            );
+                                            window.open(
+                                              article.url,
+                                              "_blank",
+                                              "noopener,noreferrer"
+                                            );
+                                          }}
+                                          className="cursor-pointer"
+                                        >
                                           <ExternalLink className="h-4 w-4 mr-2" />
                                           Read Full Article
                                         </DropdownMenuItem>
