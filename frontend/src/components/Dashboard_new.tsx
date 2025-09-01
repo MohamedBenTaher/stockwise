@@ -78,9 +78,9 @@ export const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="flex items-center space-x-2">
-          <Loader2 className="h-6 w-6 animate-spin" />
-          <span>Loading dashboard...</span>
+        <div className="flex items-center space-x-3 p-6 bg-card rounded-lg border border-border shadow-card">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <span className="text-foreground font-medium">Loading dashboard...</span>
         </div>
       </div>
     );
@@ -88,20 +88,20 @@ export const Dashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Welcome to your portfolio overview</p>
+      <div className="space-y-6 animate-fade-in">
+        <div className="gradient-bg p-8 rounded-lg border border-border">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
+          <p className="text-muted-foreground">Welcome to your portfolio overview</p>
         </div>
 
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="shadow-card">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Failed to load dashboard data. Please try again.
             <Button
               variant="outline"
               size="sm"
-              className="ml-2"
+              className="ml-2 hover:bg-destructive/10"
               onClick={() => window.location.reload()}
             >
               Retry
@@ -117,17 +117,32 @@ export const Dashboard: React.FC = () => {
   const hasHoldings = holdings && holdings.length > 0;
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">Welcome to your portfolio overview</p>
+    <div className="space-y-6 animate-fade-in">
+      {/* Enhanced Page Header with Gradient Background */}
+      <div className="gradient-bg p-8 rounded-lg border border-border shadow-card">
+        <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
+        <p className="text-muted-foreground">Welcome to your portfolio overview</p>
       </div>
 
-      {/* Portfolio Summary Cards */}
+      {/* Portfolio Summary Cards with Enhanced Styling */}
       {portfolioSummary ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
+          <Card className="card-enhanced interactive-element">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Value
+              </CardTitle>
+              <DollarSign className="h-4 w-4 text-chart-1" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-foreground">
+                {formatCurrency(portfolioSummary.total_value)}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Across {portfolioSummary.total_holdings} holdings
+              </p>
+            </CardContent>
+          </Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Value</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />

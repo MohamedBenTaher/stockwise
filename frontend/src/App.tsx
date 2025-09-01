@@ -21,6 +21,7 @@ import { Loader2 } from "lucide-react";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import "./App.css";
 import { News } from "./components/News";
+import ColorShowcase from "./components/ColorShowcase";
 
 function App() {
   const { data: user, isLoading, error } = useUser();
@@ -53,6 +54,8 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             {/* Auth page is public */}
             <Route path="/auth" element={<AuthForm />} />
+            {/* Color showcase - temporary for design review */}
+            <Route path="/colors" element={<ColorShowcase />} />
 
             {/* Dashboard and all protected subroutes */}
             <Route
