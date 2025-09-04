@@ -424,7 +424,8 @@ const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
                         <div className="flex-1">
                           <div className="font-medium">{stock.value}</div>
                           <div className="text-sm text-muted-foreground">
-                            {stock.label.replace(`${stock.value} - `, "")}
+                            {stock.label?.replace(`${stock.value} - `, "") ||
+                              stock.value}
                           </div>
                           {(stock.sector || stock.exchange) && (
                             <div className="text-xs text-muted-foreground mt-1">

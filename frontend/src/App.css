@@ -160,72 +160,134 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(0.98 0 0);
-  --foreground: oklch(0.1 0 0);
-  --card: oklch(0.96 0 0);
-  --card-foreground: oklch(0.1 0 0);
-  --popover: oklch(0.96 0 0);
-  --popover-foreground: oklch(0.1 0 0);
-  --primary: oklch(0.4 0.15 250);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.92 0 0);
-  --secondary-foreground: oklch(0.15 0 0);
-  --muted: oklch(0.94 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.92 0 0);
-  --accent-foreground: oklch(0.15 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.8 0 0);
-  --input: oklch(0.8 0 0);
-  --ring: oklch(0.4 0.15 250);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.96 0 0);
-  --sidebar-foreground: oklch(0.1 0 0);
-  --sidebar-primary: oklch(0.4 0.15 250);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.92 0 0);
-  --sidebar-accent-foreground: oklch(0.15 0 0);
-  --sidebar-border: oklch(0.8 0 0);
-  --sidebar-ring: oklch(0.4 0.15 250);
+  /* Modern light theme with enhanced contrast and accessibility */
+  --background: oklch(0.99 0.002 210);
+  --foreground: oklch(0.09 0.005 240);
+
+  /* Enhanced card system with better elevation */
+  --card: oklch(0.985 0.003 210);
+  --card-foreground: oklch(0.09 0.005 240);
+
+  --popover: oklch(0.995 0.001 210);
+  --popover-foreground: oklch(0.08 0.005 240);
+
+  /* Professional primary blue with excellent contrast */
+  --primary: oklch(0.45 0.15 250);
+  --primary-foreground: oklch(0.98 0.001 210);
+
+  /* Refined secondary system */
+  --secondary: oklch(0.94 0.008 250);
+  --secondary-foreground: oklch(0.12 0.008 240);
+
+  /* Optimized muted colors for better hierarchy */
+  --muted: oklch(0.955 0.005 250);
+  --muted-foreground: oklch(0.48 0.01 240);
+
+  --accent: oklch(0.96 0.005 250);
+  --accent-foreground: oklch(0.15 0.008 240);
+
+  /* Financial colors optimized for accessibility and clarity */
+  --success: oklch(0.52 0.14 145);
+  --success-foreground: oklch(0.98 0.001 145);
+  --warning: oklch(0.65 0.12 85);
+  --warning-foreground: oklch(0.08 0.005 85);
+
+  --destructive: oklch(0.58 0.18 15);
+  --destructive-foreground: oklch(0.98 0.001 15);
+
+  /* Enhanced borders and inputs */
+  --border: oklch(0.88 0.008 250);
+  --input: oklch(0.96 0.005 250);
+
+  /* Improved focus ring */
+  --ring: oklch(0.45 0.15 250);
+
+  /* Professional chart colors with excellent visibility */
+  --chart-1: #3b82f6;
+  /* Primary Blue */
+  --chart-2: #22c55e;
+  /* Success Green */
+  --chart-3: #ef4444;
+  /* Danger Red */
+  --chart-4: #f97316;
+  /* Warning Orange */
+  --chart-5: #8b5cf6;
+  /* Purple Accent */
+
+  --radius: 0.5rem;
+
+  /* Enhanced sidebar system */
+  --sidebar: oklch(0.975 0.004 250);
+  --sidebar-foreground: oklch(0.1 0.005 240);
+  --sidebar-primary: oklch(0.45 0.15 250);
+  --sidebar-primary-foreground: oklch(0.98 0.001 210);
+  --sidebar-accent: oklch(0.92 0.008 250);
+  --sidebar-accent-foreground: oklch(0.15 0.008 240);
+  --sidebar-border: oklch(0.85 0.008 250);
+  --sidebar-ring: oklch(0.45 0.15 250);
 }
 
 .dark {
-  --background: oklch(0.08 0 0);
-  --foreground: oklch(0.95 0 0);
-  --card: oklch(0.12 0 0);
-  --card-foreground: oklch(0.95 0 0);
-  --popover: oklch(0.12 0 0);
-  --popover-foreground: oklch(0.95 0 0);
-  --primary: oklch(0.7 0.2 250);
-  --primary-foreground: oklch(0.08 0 0);
-  --secondary: oklch(0.18 0 0);
-  --secondary-foreground: oklch(0.95 0 0);
-  --muted: oklch(0.16 0 0);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.18 0 0);
-  --accent-foreground: oklch(0.95 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(0.25 0 0);
-  --input: oklch(0.2 0 0);
-  --ring: oklch(0.7 0.2 250);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.1 0 0);
-  --sidebar-foreground: oklch(0.95 0 0);
-  --sidebar-primary: oklch(0.7 0.2 250);
-  --sidebar-primary-foreground: oklch(0.08 0 0);
-  --sidebar-accent: oklch(0.18 0 0);
-  --sidebar-accent-foreground: oklch(0.95 0 0);
-  --sidebar-border: oklch(0.25 0 0);
-  --sidebar-ring: oklch(0.7 0.2 250);
+  /* Enhanced dark theme with better contrast and depth */
+  --background: oklch(0.08 0.008 240);
+  --foreground: oklch(0.96 0.003 210);
+
+  /* Premium dark cards with improved visibility */
+  --card: oklch(0.11 0.01 240);
+  --card-foreground: oklch(0.96 0.003 210);
+
+  --popover: oklch(0.09 0.008 240);
+  --popover-foreground: oklch(0.95 0.003 210);
+
+  /* Vibrant primary optimized for dark backgrounds */
+  --primary: oklch(0.62 0.15 250);
+  --primary-foreground: oklch(0.08 0.008 240);
+
+  /* Improved secondary contrast */
+  --secondary: oklch(0.16 0.01 240);
+  --secondary-foreground: oklch(0.9 0.003 210);
+
+  /* Dark mode muted colors with better readability */
+  --muted: oklch(0.14 0.008 240);
+  --muted-foreground: oklch(0.65 0.008 210);
+
+  --accent: oklch(0.18 0.01 240);
+  --accent-foreground: oklch(0.9 0.003 210);
+
+  /* Dark-optimized financial colors with excellent visibility */
+  --success: oklch(0.58 0.14 145);
+  --warning: oklch(0.7 0.12 85);
+
+  --destructive: oklch(0.65 0.18 15);
+
+  /* Dark borders with better definition */
+  --border: oklch(0.2 0.01 240);
+  --input: oklch(0.14 0.008 240);
+
+  /* Enhanced dark mode focus ring */
+  --ring: oklch(0.62 0.15 250);
+
+  /* FIXED: Dark-optimized chart colors with maximum visibility */
+  --chart-1: #60a5fa;
+  /* Bright Blue */
+  --chart-2: #4ade80;
+  /* Bright Green */
+  --chart-3: #f87171;
+  /* Bright Red */
+  --chart-4: #fb923c;
+  /* Bright Orange */
+  --chart-5: #a78bfa;
+  /* Bright Purple */
+
+  /* Dark sidebar with premium appearance */
+  --sidebar: oklch(0.06 0.006 240);
+  --sidebar-foreground: oklch(0.94 0.003 210);
+  --sidebar-primary: oklch(0.62 0.15 250);
+  --sidebar-primary-foreground: oklch(0.08 0.008 240);
+  --sidebar-accent: oklch(0.12 0.008 240);
+  --sidebar-accent-foreground: oklch(0.85 0.003 210);
+  --sidebar-border: oklch(0.18 0.01 240);
+  --sidebar-ring: oklch(0.62 0.15 250);
 }
 
 @layer base {

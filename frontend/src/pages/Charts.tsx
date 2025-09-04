@@ -24,7 +24,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Loader2, AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  AlertCircle,
+  TrendingUp,
+  Briefcase,
+  Activity,
+} from "lucide-react";
 import { Alert, AlertDescription } from "../components/ui/alert";
 
 const Charts: React.FC = () => {
@@ -172,91 +178,120 @@ const Charts: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6 glass-card">
-      {/* Header */}
-      <div className="glass-card p-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-semibold text-foreground">
-            Portfolio Charts
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Visualize your portfolio performance and allocation
-          </p>
-        </div>
+    <div className="container mx-auto p-6 space-y-8">
+      {/* Enhanced Header */}
+      <div className="glass-card p-8 animate-fade-in">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-bold text-foreground mb-2">
+              Portfolio Charts
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              Visualize your portfolio performance and allocation
+            </p>
+          </div>
 
-        <div className="flex items-center gap-4">
-          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-[180px] bg-white/10 backdrop-blur-sm border-white/20 text-foreground hover:bg-white/15 focus:bg-white/15 focus:border-white/30">
-              <SelectValue placeholder="Select period" />
-            </SelectTrigger>
-            <SelectContent className="bg-white/10 backdrop-blur-md border-white/20 text-foreground">
-              {periods.map((period) => (
-                <SelectItem
-                  key={period.value}
-                  value={period.value}
-                  className="text-foreground hover:bg-white/20 focus:bg-white/20 focus:text-foreground"
-                >
-                  {period.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-4">
+            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+              <SelectTrigger className="w-[180px] glass-card-hover border-0 text-foreground">
+                <SelectValue placeholder="Select period" />
+              </SelectTrigger>
+              <SelectContent className="bg-card/95 backdrop-blur-md border border-border text-foreground">
+                {periods.map((period) => (
+                  <SelectItem
+                    key={period.value}
+                    value={period.value}
+                    className="text-foreground hover:bg-accent focus:bg-accent focus:text-accent-foreground"
+                  >
+                    {period.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
-      {/* Real Metrics Cards - Show these first since we know they work */}
+      {/* Enhanced Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Total Return</CardDescription>
-            <CardTitle
-              className={`text-2xl ${
+        <div className="glass-card-hover p-6 animate-slide-up">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-muted-foreground">
+              Total Return
+            </h3>
+            <div
+              className={`p-2 rounded-lg ${
                 (metricsData?.total_return?.amount || 0) >= 0
-                  ? "text-green-600"
-                  : "text-red-600"
+                  ? "bg-chart-2/10"
+                  : "bg-chart-3/10"
               }`}
             >
-              {formatCurrency(metricsData?.total_return?.amount || 0)}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs text-muted-foreground">
-              {formatPercentage(metricsData?.total_return?.percentage || 0)}{" "}
-              from initial investment
+              <TrendingUp
+                className={`h-4 w-4 ${
+                  (metricsData?.total_return?.amount || 0) >= 0
+                    ? "text-chart-2"
+                    : "text-chart-3"
+                }`}
+              />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div
+            className={`text-3xl font-bold mb-1 ${
+              (metricsData?.total_return?.amount || 0) >= 0
+                ? "text-chart-2"
+                : "text-chart-3"
+            }`}
+          >
+            {formatCurrency(metricsData?.total_return?.amount || 0)}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {formatPercentage(metricsData?.total_return?.percentage || 0)} from
+            initial investment
+          </p>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Best Performer</CardDescription>
-            <CardTitle className="text-2xl">
-              {metricsData?.best_performer?.ticker || "N/A"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs text-muted-foreground">
-              {metricsData?.best_performer
-                ? formatPercentage(metricsData.best_performer.percentage) +
-                  " gain this period"
-                : "No data available"}
+        <div
+          className="glass-card-hover p-6 animate-slide-up"
+          style={{ animationDelay: "0.1s" }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-muted-foreground">
+              Best Performer
+            </h3>
+            <div className="p-2 rounded-lg bg-chart-1/10">
+              <TrendingUp className="h-4 w-4 text-chart-1" />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="text-3xl font-bold text-foreground mb-1">
+            {metricsData?.best_performer?.ticker || "N/A"}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {metricsData?.best_performer
+              ? formatPercentage(metricsData.best_performer.percentage) +
+                " gain this period"
+              : "No data available"}
+          </p>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Portfolio Size</CardDescription>
-            <CardTitle className="text-2xl">
-              {metricsData?.holdings_count || 0} Holdings
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs text-muted-foreground">
-              {metricsData?.volatility || "Medium"} volatility
+        <div
+          className="glass-card-hover p-6 animate-slide-up"
+          style={{ animationDelay: "0.2s" }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-muted-foreground">
+              Portfolio Size
+            </h3>
+            <div className="p-2 rounded-lg bg-chart-4/10">
+              <Briefcase className="h-4 w-4 text-chart-4" />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="text-3xl font-bold text-foreground mb-1">
+            {metricsData?.holdings_count || 0} Holdings
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {metricsData?.volatility || "Medium"} volatility
+          </p>
+        </div>
       </div>
 
       {/* Portfolio Performance Chart - Show if we have data */}

@@ -30,10 +30,10 @@ export function NavMain({
             <SidebarMenuButton
               tooltip="Add Holding"
               onClick={() => navigate("/dashboard/holdings/add")}
-              className="bg-primary/20 text-foreground hover:bg-primary/30 backdrop-blur-sm border border-white/10 min-w-8 duration-200 ease-linear"
+              className="bg-gradient-to-r from-chart-1/20 to-chart-1/10 text-foreground hover:from-chart-1/30 hover:to-chart-1/20 backdrop-blur-sm border border-chart-1/20 hover:border-chart-1/30 min-w-8 duration-200 ease-linear transition-all"
             >
-              <IconCirclePlusFilled />
-              <span>Add Holding</span>
+              <IconCirclePlusFilled className="text-chart-1" />
+              <span className="font-medium">Add Holding</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -50,16 +50,23 @@ export function NavMain({
                   tooltip={item.title}
                   onClick={() => navigate(item.url)}
                   className={`
-                    transition-all duration-200 ease-linear
+                    transition-all duration-200 ease-linear group hover:scale-[1.02]
                     ${
                       isActive
-                        ? "bg-primary/20 text-foreground border border-white/20 backdrop-blur-sm"
-                        : "text-muted-foreground hover:bg-white/10 hover:text-foreground"
+                        ? "bg-gradient-to-r from-chart-1/20 to-chart-1/10 text-foreground border border-chart-1/30 backdrop-blur-sm shadow-sm"
+                        : "text-muted-foreground hover:bg-accent hover:text-foreground hover:border-border/50 border border-transparent"
                     }
                   `}
                 >
                   {item.icon && <item.icon />}
-                  <span>{item.title}</span>
+                  <span
+                    className={`font-medium ${isActive ? "font-semibold" : ""}`}
+                  >
+                    {item.title}
+                  </span>
+                  {isActive && (
+                    <div className="ml-auto w-1 h-1 bg-chart-1 rounded-full animate-pulse" />
+                  )}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             );

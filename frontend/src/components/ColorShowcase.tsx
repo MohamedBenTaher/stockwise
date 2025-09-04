@@ -120,31 +120,77 @@ export const ColorShowcase: React.FC = () => {
         <CardContent>
           <div className="grid grid-cols-5 gap-4">
             {[1, 2, 3, 4, 5].map((num) => (
-              <div key={num} className="text-center space-y-2">
+              <div key={num} className="text-center space-y-3">
                 <div
-                  className={`w-full h-20 rounded-lg bg-chart-${num} border border-border shadow-sm`}
+                  className={`w-full h-24 rounded-lg border-2 border-border shadow-sm bg-chart-${num}`}
+                  style={{
+                    backgroundColor: `var(--chart-${num})`,
+                  }}
                 ></div>
-                <span className="text-sm text-muted-foreground">
-                  Chart {num}
-                </span>
+                <div className="space-y-1">
+                  <span className="text-sm font-medium text-foreground">
+                    Chart {num}
+                  </span>
+                  <div
+                    className="text-xs px-2 py-1 rounded"
+                    style={{
+                      backgroundColor: `color-mix(in srgb, var(--chart-${num}) 10%, transparent)`,
+                      color: `var(--chart-${num})`,
+                    }}
+                  >
+                    Sample
+                  </div>
+                </div>
               </div>
             ))}
           </div>
-          <div className="mt-6 p-4 bg-muted/30 rounded-lg">
-            <h4 className="font-medium mb-2 text-foreground">
+          <div className="mt-6 p-4 bg-muted/30 rounded-lg border border-border">
+            <h4 className="font-medium mb-3 text-foreground">
               Usage Guidelines:
             </h4>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Chart 1 (Blue) - Primary data series, portfolio values</li>
-              <li>
-                • Chart 2 (Green) - Positive values, gains, growth metrics
-              </li>
-              <li>
-                • Chart 3 (Red) - Negative values, losses, risk indicators
-              </li>
-              <li>• Chart 4 (Orange) - Warning states, neutral changes</li>
-              <li>• Chart 5 (Purple) - Secondary data, comparisons</li>
-            </ul>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: `var(--chart-1)` }}
+                ></div>
+                <span>
+                  Chart 1 (Blue) - Primary data series, portfolio values
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: `var(--chart-2)` }}
+                ></div>
+                <span>
+                  Chart 2 (Green) - Positive values, gains, growth metrics
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: `var(--chart-3)` }}
+                ></div>
+                <span>
+                  Chart 3 (Red) - Negative values, losses, risk indicators
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: `var(--chart-4)` }}
+                ></div>
+                <span>Chart 4 (Orange) - Warning states, neutral changes</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: `var(--chart-5)` }}
+                ></div>
+                <span>Chart 5 (Purple) - Secondary data, comparisons</span>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
