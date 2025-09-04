@@ -22,9 +22,10 @@ import { Alert, AlertDescription } from "./ui/alert";
 import { Badge } from "./ui/badge";
 import { usePortfolioSummary, useHoldings } from "../hooks/useHoldings";
 import { useLatestInsights } from "../hooks/useInsights";
+import { DashboardSkeleton } from "./LoadingSkeletons";
 import type { Holding } from "../types/generated";
 
-export const Dashboard: React.FC = () => {
+export const Dashboard: React.FC = React.memo(() => {
   const navigate = useNavigate();
 
   // Fetch data using our typed hooks
@@ -76,14 +77,7 @@ export const Dashboard: React.FC = () => {
   const error = portfolioError || holdingsError;
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="flex items-center space-x-3 p-6 bg-card rounded-lg border border-border shadow-card">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          <span className="text-foreground font-medium">Loading dashboard...</span>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (error) {
@@ -91,7 +85,9 @@ export const Dashboard: React.FC = () => {
       <div className="space-y-6 animate-fade-in">
         <div className="gradient-bg p-8 rounded-lg border border-border">
           <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome to your portfolio overview</p>
+          <p className="text-muted-foreground">
+            Welcome to your portfolio overview
+          </p>
         </div>
 
         <Alert variant="destructive" className="shadow-card">
@@ -121,7 +117,9 @@ export const Dashboard: React.FC = () => {
       {/* Enhanced Page Header with Gradient Background */}
       <div className="gradient-bg p-8 rounded-lg border border-border shadow-card">
         <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome to your portfolio overview</p>
+        <p className="text-muted-foreground">
+          Welcome to your portfolio overview
+        </p>
       </div>
 
       {/* Portfolio Summary Cards with Enhanced Styling */}
@@ -139,39 +137,28 @@ export const Dashboard: React.FC = () => {
                 {formatCurrency(portfolioSummary.total_value)}
               </div>
               <p className="text-xs text-muted-foreground">
-                Across {portfolioSummary.total_holdings} holdings
-              </p>
-            </CardContent>
-          </Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Value</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {formatCurrency(portfolioSummary.total_value)}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {hasHoldings ? "Portfolio value" : "No holdings yet"}
+                Across {portfolioSummary.holdings_count} holdings
               </p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="card-enhanced interactive-element">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total P/L</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total P/L
+              </CardTitle>
               {portfolioSummary.total_profit_loss >= 0 ? (
-                <ArrowUpRight className="h-4 w-4 text-green-600" />
+                <ArrowUpRight className="h-4 w-4 text-chart-2" />
               ) : (
-                <ArrowDownRight className="h-4 w-4 text-red-600" />
+                <ArrowDownRight className="h-4 w-4 text-chart-4" />
               )}
             </CardHeader>
             <CardContent>
               <div
                 className={`text-2xl font-bold ${
                   portfolioSummary.total_profit_loss >= 0
-                    ? "text-green-600"
-                    : "text-red-600"
+                    ? "text-chart-2"
+                    : "text-chart-4"
                 }`}
               >
                 {formatCurrency(portfolioSummary.total_profit_loss)}
@@ -179,8 +166,8 @@ export const Dashboard: React.FC = () => {
               <p
                 className={`text-xs ${
                   portfolioSummary.total_profit_loss >= 0
-                    ? "text-green-600"
-                    : "text-red-600"
+                    ? "text-chart-2"
+                    : "text-chart-4"
                 }`}
               >
                 {formatPercentage(
@@ -190,13 +177,15 @@ export const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="card-enhanced interactive-element">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Holdings</CardTitle>
-              <Briefcase className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Holdings
+              </CardTitle>
+              <Briefcase className="h-4 w-4 text-chart-3" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-foreground">
                 {portfolioSummary.holdings_count}
               </div>
               <p className="text-xs text-muted-foreground">
@@ -205,13 +194,15 @@ export const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="card-enhanced interactive-element">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Cost</CardTitle>
-              <PieChart className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Cost
+              </CardTitle>
+              <PieChart className="h-4 w-4 text-chart-5" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-foreground">
                 {formatCurrency(portfolioSummary.total_cost)}
               </div>
               <p className="text-xs text-muted-foreground">
@@ -223,12 +214,13 @@ export const Dashboard: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="animate-pulse">
+            <Card key={i} className="card-enhanced animate-pulse">
               <CardHeader className="space-y-0 pb-2">
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-4 bg-muted rounded w-1/2"></div>
               </CardHeader>
               <CardContent>
-                <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-8 bg-muted rounded w-3/4"></div>
+                <div className="h-3 bg-muted rounded w-1/2 mt-2"></div>
               </CardContent>
             </Card>
           ))}
@@ -238,10 +230,10 @@ export const Dashboard: React.FC = () => {
       {/* Performance and Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Performers */}
-        <Card>
+        <Card className="card-enhanced">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <TrendingUp className="h-5 w-5 mr-2 text-green-600" />
+            <CardTitle className="flex items-center text-foreground">
+              <TrendingUp className="h-5 w-5 mr-2 text-chart-2" />
               Top Performers
             </CardTitle>
             <CardDescription>
@@ -255,13 +247,13 @@ export const Dashboard: React.FC = () => {
               topPerformers.map((holding) => (
                 <div
                   key={holding.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors duration-200 border border-border/50"
                 >
                   <div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-foreground">
                       {holding.ticker}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       {formatCurrency(holding.total_value)} • {holding.quantity}{" "}
                       shares
                     </p>
@@ -277,19 +269,19 @@ export const Dashboard: React.FC = () => {
                     >
                       {formatPercentage(holding.profit_loss_percentage)}
                     </Badge>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       {formatCurrency(holding.profit_loss)}
                     </p>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <Briefcase className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <div className="text-center py-8 text-muted-foreground">
+                <Briefcase className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
                 <p>Add some holdings to see performance</p>
                 <Button
                   className="mt-3"
-                  onClick={() => navigate("/holdings/add")}
+                  onClick={() => navigate("/dashboard/holdings/add")}
                 >
                   Add Holding
                 </Button>
@@ -299,9 +291,9 @@ export const Dashboard: React.FC = () => {
         </Card>
 
         {/* Quick Actions */}
-        <Card>
+        <Card className="card-enhanced">
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle className="text-foreground">Quick Actions</CardTitle>
             <CardDescription>
               Manage your portfolio and get insights
             </CardDescription>
@@ -309,7 +301,7 @@ export const Dashboard: React.FC = () => {
           <CardContent className="space-y-3">
             <Button
               className="w-full"
-              onClick={() => navigate("/holdings/add")}
+              onClick={() => navigate("/dashboard/holdings/add")}
             >
               <DollarSign className="h-4 w-4 mr-2" />
               Add New Holding
@@ -317,7 +309,7 @@ export const Dashboard: React.FC = () => {
             <Button
               variant="secondary"
               className="w-full"
-              onClick={() => navigate("/insights")}
+              onClick={() => navigate("/dashboard/insights")}
               disabled={!hasHoldings}
             >
               <TrendingUp className="h-4 w-4 mr-2" />
@@ -326,7 +318,7 @@ export const Dashboard: React.FC = () => {
             <Button
               variant="secondary"
               className="w-full"
-              onClick={() => navigate("/risk")}
+              onClick={() => navigate("/dashboard/risk")}
               disabled={!hasHoldings}
             >
               <AlertCircle className="h-4 w-4 mr-2" />
@@ -335,7 +327,7 @@ export const Dashboard: React.FC = () => {
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => navigate("/holdings")}
+              onClick={() => navigate("/dashboard/holdings")}
             >
               <Briefcase className="h-4 w-4 mr-2" />
               Manage Holdings
@@ -347,9 +339,11 @@ export const Dashboard: React.FC = () => {
       {/* Insights and Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* AI Insights Preview */}
-        <Card>
+        <Card className="card-enhanced">
           <CardHeader>
-            <CardTitle>Latest AI Insights</CardTitle>
+            <CardTitle className="text-foreground">
+              Latest AI Insights
+            </CardTitle>
             <CardDescription>
               {insightsLoading
                 ? "Generating insights..."
@@ -360,19 +354,19 @@ export const Dashboard: React.FC = () => {
             {insightsLoading ? (
               <div className="flex items-center space-x-2 py-4">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-muted-foreground">
                   Loading insights...
                 </span>
               </div>
             ) : insights ? (
               <div className="space-y-3">
-                <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
-                  <p className="text-sm font-medium text-blue-900">
+                <div className="p-3 rounded-lg bg-chart-1/10 border border-chart-1/20">
+                  <p className="text-sm font-medium text-foreground">
                     Risk Level:{" "}
                     {insights.insight?.risk_summary?.overall_risk_level ||
                       "Unknown"}
                   </p>
-                  <p className="text-xs text-blue-700 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Score: {insights.insight?.risk_summary?.risk_score || 0}/100
                   </p>
                 </div>
@@ -382,7 +376,7 @@ export const Dashboard: React.FC = () => {
                   .map((rec, index) => (
                     <div
                       key={index}
-                      className="text-sm text-gray-600 p-2 bg-gray-50 rounded"
+                      className="text-sm text-muted-foreground p-2 bg-muted/50 rounded border border-border/50"
                     >
                       • {rec}
                     </div>
@@ -392,24 +386,24 @@ export const Dashboard: React.FC = () => {
                   variant="outline"
                   size="sm"
                   className="w-full mt-3"
-                  onClick={() => navigate("/insights")}
+                  onClick={() => navigate("/dashboard/insights")}
                 >
                   View Full Insights
                 </Button>
               </div>
             ) : hasHoldings ? (
-              <div className="text-center py-6 text-gray-500">
+              <div className="text-center py-6 text-muted-foreground">
                 <p className="mb-3">No recent insights available</p>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => navigate("/insights")}
+                  onClick={() => navigate("/dashboard/insights")}
                 >
                   Generate Insights
                 </Button>
               </div>
             ) : (
-              <div className="text-center py-6 text-gray-500">
+              <div className="text-center py-6 text-muted-foreground">
                 <p>Add holdings to get AI insights</p>
               </div>
             )}
@@ -417,9 +411,11 @@ export const Dashboard: React.FC = () => {
         </Card>
 
         {/* Portfolio at a Glance */}
-        <Card>
+        <Card className="card-enhanced">
           <CardHeader>
-            <CardTitle>Portfolio at a Glance</CardTitle>
+            <CardTitle className="text-foreground">
+              Portfolio at a Glance
+            </CardTitle>
             <CardDescription>Key metrics and performance</CardDescription>
           </CardHeader>
           <CardContent>
@@ -427,18 +423,18 @@ export const Dashboard: React.FC = () => {
               <div className="space-y-4">
                 {/* Best and Worst Performer */}
                 {topPerformers.length > 0 && (
-                  <div className="flex justify-between items-center p-3 rounded-lg bg-green-50">
+                  <div className="flex justify-between items-center p-3 rounded-lg bg-chart-2/10 border border-chart-2/20">
                     <div>
-                      <p className="text-sm font-medium text-green-900">
+                      <p className="text-sm font-medium text-foreground">
                         Best Performer
                       </p>
-                      <p className="text-xs text-green-700">
+                      <p className="text-xs text-muted-foreground">
                         {topPerformers[0].ticker}
                       </p>
                     </div>
                     <Badge
                       variant="default"
-                      className="text-green-700 bg-green-100"
+                      className="text-chart-2 bg-chart-2/10 border-chart-2/20"
                     >
                       {formatPercentage(
                         topPerformers[0].profit_loss_percentage
@@ -449,18 +445,18 @@ export const Dashboard: React.FC = () => {
 
                 {worstPerformers.length > 0 &&
                   worstPerformers[0].profit_loss_percentage < 0 && (
-                    <div className="flex justify-between items-center p-3 rounded-lg bg-red-50">
+                    <div className="flex justify-between items-center p-3 rounded-lg bg-chart-4/10 border border-chart-4/20">
                       <div>
-                        <p className="text-sm font-medium text-red-900">
+                        <p className="text-sm font-medium text-foreground">
                           Needs Attention
                         </p>
-                        <p className="text-xs text-red-700">
+                        <p className="text-xs text-muted-foreground">
                           {worstPerformers[0].ticker}
                         </p>
                       </div>
                       <Badge
                         variant="destructive"
-                        className="text-red-700 bg-red-100"
+                        className="text-chart-4 bg-chart-4/10 border-chart-4/20"
                       >
                         {formatPercentage(
                           worstPerformers[0].profit_loss_percentage
@@ -474,17 +470,17 @@ export const Dashboard: React.FC = () => {
                     variant="outline"
                     size="sm"
                     className="w-full"
-                    onClick={() => navigate("/holdings")}
+                    onClick={() => navigate("/dashboard/holdings")}
                   >
                     View All Holdings
                   </Button>
                 </div>
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <PieChart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <div className="text-center py-8 text-muted-foreground">
+                <PieChart className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
                 <p className="mb-3">Start building your portfolio</p>
-                <Button onClick={() => navigate("/holdings/add")}>
+                <Button onClick={() => navigate("/dashboard/holdings/add")}>
                   Add First Holding
                 </Button>
               </div>
@@ -494,4 +490,6 @@ export const Dashboard: React.FC = () => {
       </div>
     </div>
   );
-};
+});
+
+Dashboard.displayName = "Dashboard";

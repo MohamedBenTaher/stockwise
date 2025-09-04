@@ -68,6 +68,7 @@
     "tw-animate-css": "^1.3.5",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.35.1",
-    "vite": "^5.4.19"
+    "vite": "^5.4.19",
+    "webpack-bundle-analyzer": "^4.10.2"
   }
 }

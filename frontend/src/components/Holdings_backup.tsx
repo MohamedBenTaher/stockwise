@@ -47,6 +47,7 @@ import { Calendar } from "./ui/calendar";
 
 import { useHoldings, useUpdateHolding, useDeleteHolding } from "@/hooks";
 import { toast } from "sonner";
+import { useForm } from "react-hook-form";
 
 const holdingSchema = z.object({
   ticker: z.string().min(1, "Ticker is required").max(10, "Ticker too long"),
@@ -191,6 +192,7 @@ export const Holdings: React.FC = () => {
               </Button>
           </AlertDescription>
         </Alert>
+      </div>
       </div>
     );
   }
