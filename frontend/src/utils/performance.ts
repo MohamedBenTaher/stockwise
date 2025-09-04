@@ -85,12 +85,13 @@ export class PerformanceMonitor {
   // Check if performance is degrading
   checkPerformanceHealth(): { healthy: boolean; issues: string[] } {
     const issues: string[] = [];
-    
+
     // Check API call times
     for (const [key, values] of this.metrics.entries()) {
-      if (key.startsWith('api_') && values.length > 10) {
+      if (key.startsWith("api_") && values.length > 10) {
         const stats = this.getStats(key);
-        if (stats && stats.p95 > 5000) { // 5 seconds
+        if (stats && stats.p95 > 5000) {
+          // 5 seconds
           issues.push(`API ${key} is slow (P95: ${stats.p95.toFixed(0)}ms)`);
         }
       }
@@ -98,30 +99,35 @@ export class PerformanceMonitor {
 
     // Check render times
     for (const [key, values] of this.metrics.entries()) {
-      if (key.startsWith('render_') && values.length > 10) {
+      if (key.startsWith("render_") && values.length > 10) {
         const stats = this.getStats(key);
-        if (stats && stats.p95 > 100) { // 100ms
-          issues.push(`Component ${key} is slow to render (P95: ${stats.p95.toFixed(0)}ms)`);
+        if (stats && stats.p95 > 100) {
+          // 100ms
+          issues.push(
+            `Component ${key} is slow to render (P95: ${stats.p95.toFixed(
+              0
+            )}ms)`
+          );
         }
       }
     }
 
     return {
       healthy: issues.length === 0,
-      issues
+      issues,
     };
   }
 }
 
 // React hook for performance monitoring
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 export function usePerformanceMonitor(componentName: string) {
   const monitor = PerformanceMonitor.getInstance();
 
   useEffect(() => {
     const start = performance.now();
-    
+
     return () => {
       const end = performance.now();
       monitor.measureRender(componentName, () => {
@@ -140,7 +146,8 @@ export function usePerformanceMonitor(componentName: string) {
 // Cache performance utilities
 export class CacheManager {
   private static instance: CacheManager;
-  private cache: Map<string, { data: any; timestamp: number; ttl: number }> = new Map();
+  private cache: Map<string, { data: any; timestamp: number; ttl: number }> =
+    new Map();
 
   static getInstance(): CacheManager {
     if (!CacheManager.instance) {
@@ -197,14 +204,14 @@ export class CacheManager {
 }
 
 // Development helper to monitor performance
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === "development") {
   // Log performance stats every 30 seconds
   setInterval(() => {
     const monitor = PerformanceMonitor.getInstance();
     const health = monitor.checkPerformanceHealth();
-    
+
     if (!health.healthy) {
-      console.warn('⚠️ Performance issues detected:', health.issues);
+      console.warn("⚠️ Performance issues detected:", health.issues);
     }
   }, 30000);
 
@@ -213,10 +220,10 @@ if (process.env.NODE_ENV === 'development') {
     monitor: PerformanceMonitor.getInstance(),
     cache: CacheManager.getInstance(),
     logStats: () => {
-      console.group('📊 StockWise Performance Dashboard');
+      console.group("📊 StockWise Performance Dashboard");
       PerformanceMonitor.getInstance().logSummary();
-      console.log('Cache Stats:', CacheManager.getInstance().getStats());
+      console.log("Cache Stats:", CacheManager.getInstance().getStats());
       console.groupEnd();
-    }
+    },
   };
 }

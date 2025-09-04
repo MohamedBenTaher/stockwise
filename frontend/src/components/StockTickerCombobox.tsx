@@ -23,7 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Badge } from "./ui/badge";
-import api from "../api/api";
+import { stocksApi } from "../services/api";
 
 interface Stock {
   value: string;
@@ -222,8 +222,7 @@ const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
         }
 
         // Fetch from API with enhanced caching
-        const response = await api.get("/api/v1/stocks/popular");
-        const apiStocks = response.data;
+        const apiStocks = await stocksApi.getPopularStocks();
 
         // Add the "OTHER" option at the end
         const enhancedStocks = [
@@ -261,10 +260,8 @@ const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
 
       try {
         setIsSearching(true);
-        const response = await api.get(`/api/v1/stocks/search`, {
-          params: { q: searchQuery, limit: 10 },
-        });
-        setSearchResults(response.data);
+        const searchResults = await stocksApi.searchStocks(searchQuery, 10);
+        setSearchResults(searchResults);
       } catch (error) {
         console.error("Failed to search stocks:", error);
         // Fallback to local filtering
@@ -300,8 +297,8 @@ const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
 
     try {
       // Validate the ticker
-      const response = await api.get(`/api/v1/stocks/validate/${ticker}`);
-      if (response.data.valid) {
+      const response = await stocksApi.validateTicker(ticker);
+      if (response.valid) {
         // Add to stocks list and select it
         const newStock = {
           value: ticker,
@@ -407,9 +404,9 @@ const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
 
               {displayedStocks.length > 0 && (
                 <CommandGroup>
-                  {displayedStocks.map((stock) => (
+                  {displayedStocks.map((stock, index) => (
                     <CommandItem
-                      key={stock.value}
+                      key={`${stock.value}-${index}`}
                       value={stock.value}
                       onSelect={() => handleSelect(stock.value)}
                       className="flex flex-col items-start py-3"

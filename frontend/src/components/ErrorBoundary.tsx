@@ -1,8 +1,8 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
-import { PerformanceMonitor } from '@/utils/performance';
+import React, { Component, ErrorInfo, ReactNode } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertTriangle, RefreshCw, Home, Bug } from "lucide-react";
+import { PerformanceMonitor } from "@/utils/performance";
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -17,7 +17,10 @@ interface ErrorBoundaryProps {
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   private monitor: PerformanceMonitor;
 
   constructor(props: ErrorBoundaryProps) {
@@ -26,13 +29,15 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       hasError: false,
       error: null,
       errorInfo: null,
-      errorId: '',
+      errorId: "",
     };
     this.monitor = PerformanceMonitor.getInstance();
   }
 
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-    const errorId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const errorId = `error_${Date.now()}_${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
     return {
       hasError: true,
       error,
@@ -47,11 +52,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     });
 
     // Log error for monitoring
-    console.error('🔥 ErrorBoundary caught an error:', error);
-    console.error('Error Info:', errorInfo);
+    console.error("🔥 ErrorBoundary caught an error:", error);
+    console.error("Error Info:", errorInfo);
 
     // Track error in performance monitor
-    this.monitor.measureRender('error_boundary', () => {
+    this.monitor.measureRender("error_boundary", () => {
       // Error occurred during render
     });
 
@@ -61,7 +66,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
 
     // In production, you might want to send this to an error reporting service
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === "production") {
       this.reportError(error, errorInfo);
     }
   }
@@ -76,11 +81,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
       url: window.location.href,
-      userId: localStorage.getItem('user_id'), // If you store user ID
+      userId: localStorage.getItem("user_id"), // If you store user ID
     };
 
     // For now, just log it
-    console.error('Error Report:', errorReport);
+    console.error("Error Report:", errorReport);
   }
 
   private handleRetry = () => {
@@ -88,12 +93,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       hasError: false,
       error: null,
       errorInfo: null,
-      errorId: '',
+      errorId: "",
     });
   };
 
   private handleGoHome = () => {
-    window.location.href = '/';
+    window.location.href = "/";
   };
 
   private copyErrorToClipboard = () => {
@@ -109,7 +114,7 @@ URL: ${window.location.href}
 
     navigator.clipboard.writeText(errorText).then(() => {
       // You could show a toast notification here
-      console.log('Error details copied to clipboard');
+      console.log("Error details copied to clipboard");
     });
   };
 
@@ -132,7 +137,8 @@ URL: ${window.location.href}
                 Oops! Something went wrong
               </CardTitle>
               <p className="text-muted-foreground mt-2">
-                We encountered an unexpected error. Don't worry, your data is safe.
+                We encountered an unexpected error. Don't worry, your data is
+                safe.
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -146,7 +152,7 @@ URL: ${window.location.href}
 
               {/* Action buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
-                <Button 
+                <Button
                   onClick={this.handleRetry}
                   className="flex-1"
                   variant="default"
@@ -154,7 +160,7 @@ URL: ${window.location.href}
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Try Again
                 </Button>
-                <Button 
+                <Button
                   onClick={this.handleGoHome}
                   variant="outline"
                   className="flex-1"
@@ -165,7 +171,7 @@ URL: ${window.location.href}
               </div>
 
               {/* Development details */}
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+              {process.env.NODE_ENV === "development" && this.state.error && (
                 <details className="mt-6">
                   <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground">
                     <Bug className="w-4 h-4 inline mr-2" />
@@ -173,26 +179,32 @@ URL: ${window.location.href}
                   </summary>
                   <div className="mt-4 space-y-4">
                     <div>
-                      <h4 className="font-medium text-foreground mb-2">Error Message:</h4>
+                      <h4 className="font-medium text-foreground mb-2">
+                        Error Message:
+                      </h4>
                       <pre className="text-sm bg-muted/50 p-3 rounded overflow-auto">
                         {this.state.error.message}
                       </pre>
                     </div>
                     <div>
-                      <h4 className="font-medium text-foreground mb-2">Stack Trace:</h4>
+                      <h4 className="font-medium text-foreground mb-2">
+                        Stack Trace:
+                      </h4>
                       <pre className="text-sm bg-muted/50 p-3 rounded overflow-auto max-h-40">
                         {this.state.error.stack}
                       </pre>
                     </div>
                     {this.state.errorInfo && (
                       <div>
-                        <h4 className="font-medium text-foreground mb-2">Component Stack:</h4>
+                        <h4 className="font-medium text-foreground mb-2">
+                          Component Stack:
+                        </h4>
                         <pre className="text-sm bg-muted/50 p-3 rounded overflow-auto max-h-40">
                           {this.state.errorInfo.componentStack}
                         </pre>
                       </div>
                     )}
-                    <Button 
+                    <Button
                       onClick={this.copyErrorToClipboard}
                       variant="outline"
                       size="sm"
@@ -206,7 +218,8 @@ URL: ${window.location.href}
               {/* Help text */}
               <div className="text-center pt-4 border-t border-border">
                 <p className="text-sm text-muted-foreground">
-                  If this problem persists, please contact support with the error ID above.
+                  If this problem persists, please contact support with the
+                  error ID above.
                 </p>
               </div>
             </CardContent>
@@ -222,7 +235,7 @@ URL: ${window.location.href}
 // Higher-order component for easy wrapping
 export function withErrorBoundary<P extends object>(
   WrappedComponent: React.ComponentType<P>,
-  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>
+  errorBoundaryProps?: Omit<ErrorBoundaryProps, "children">
 ) {
   const WithErrorBoundaryComponent = (props: P) => (
     <ErrorBoundary {...errorBoundaryProps}>
@@ -230,8 +243,9 @@ export function withErrorBoundary<P extends object>(
     </ErrorBoundary>
   );
 
-  WithErrorBoundaryComponent.displayName = 
-    `withErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name})`;
+  WithErrorBoundaryComponent.displayName = `withErrorBoundary(${
+    WrappedComponent.displayName || WrappedComponent.name
+  })`;
 
   return WithErrorBoundaryComponent;
 }
@@ -239,10 +253,10 @@ export function withErrorBoundary<P extends object>(
 // Hook for error reporting in functional components
 export function useErrorHandler() {
   return (error: Error, errorInfo?: any) => {
-    console.error('Manual error report:', error);
-    
+    console.error("Manual error report:", error);
+
     // In a real app, you'd send this to your error reporting service
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === "production") {
       // reportError(error, errorInfo);
     }
   };

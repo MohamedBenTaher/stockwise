@@ -170,4 +170,28 @@ export const chartsApi = {
   },
 };
 
+export const stocksApi = {
+  getPopularStocks: async (): Promise<any[]> => {
+    const response = await api.get("/stocks/popular");
+    return response.data;
+  },
+
+  searchStocks: async (query: string, limit: number = 10): Promise<any[]> => {
+    const response = await api.get("/stocks/search", {
+      params: { q: query, limit },
+    });
+    return response.data;
+  },
+
+  validateTicker: async (ticker: string): Promise<{ valid: boolean }> => {
+    const response = await api.get(`/stocks/validate/${ticker}`);
+    return response.data;
+  },
+
+  getStockQuote: async (ticker: string): Promise<any> => {
+    const response = await api.get(`/stocks/quote/${ticker}`);
+    return response.data;
+  },
+};
+
 export default api;
