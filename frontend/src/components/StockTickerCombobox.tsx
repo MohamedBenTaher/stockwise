@@ -213,16 +213,40 @@ const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
       try {
         setIsLoading(true);
 
-        // Try to get from cache first
+        // Clear cache for debugging - ensure fresh data
+        console.log("🧹 Clearing cache to get fresh data");
+        localStorage.removeItem("stockwise_popular_stocks");
+        localStorage.removeItem("stockwise_popular_stocks_time");
+
+        // Try to get from cache first (should be null now)
         const cachedStocks = getCachedStocks();
         if (cachedStocks) {
-          setStocks(cachedStocks);
-          setIsLoading(false);
-          return;
+          console.log("📦 Using cached stocks:", cachedStocks.length, "items");
+          console.log(
+            "📦 Cache age:",
+            Date.now() -
+              parseInt(
+                localStorage.getItem("stockwise_popular_stocks_time") || "0"
+              ),
+            "ms"
+          );
+          // Clear old cache if it's too big (indicates old format)
+          if (cachedStocks.length > 100) {
+            console.log("🧹 Clearing old cache (too many items)");
+            localStorage.removeItem("stockwise_popular_stocks");
+            localStorage.removeItem("stockwise_popular_stocks_time");
+          } else {
+            setStocks(cachedStocks);
+            setIsLoading(false);
+            return;
+          }
         }
 
         // Fetch from API with enhanced caching
+        console.log("🔍 Fetching stocks from API...");
         const apiStocks = await stocksApi.getPopularStocks();
+        console.log("✅ Received stocks from API:", apiStocks.length, "stocks");
+        console.log("📋 First few stocks:", apiStocks.slice(0, 3));
 
         // Add the "OTHER" option at the end
         const enhancedStocks = [
@@ -238,8 +262,13 @@ const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
         setStocks(enhancedStocks);
         setCachedStocks(enhancedStocks);
       } catch (error) {
-        console.error("Failed to load popular stocks:", error);
+        console.error("❌ Failed to load popular stocks:", error);
+        // Check if it's a network error
+        if (error instanceof Error) {
+          console.error("Error details:", error.message);
+        }
         // Fallback to enhanced static list with OTHER option
+        console.log("📦 Using fallback stocks");
         setStocks(fallbackStocks);
         setCachedStocks(fallbackStocks);
       } finally {
@@ -330,7 +359,19 @@ const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
   };
 
   const selectedStock = stocks.find((stock) => stock.value === value);
-  const displayedStocks = searchQuery ? searchResults : stocks;
+  // Use all stocks for now to debug
+  const displayedStocks = stocks;
+
+  console.log("🔍 Current state:", {
+    searchQuery: searchQuery,
+    stocksCount: stocks.length,
+    searchResultsCount: searchResults.length,
+    displayedStocksCount: displayedStocks.length,
+    isLoading: isLoading,
+    selectedStock: selectedStock?.value,
+    firstFewDisplayedStocks: displayedStocks.slice(0, 3).map((s) => s.value),
+    firstFewStockValues: stocks.slice(0, 3).map((s) => s.value),
+  });
 
   return (
     <>
@@ -359,7 +400,7 @@ const StockTickerCombobox: React.FC<StockTickerComboboxProps> = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[400px] p-0">
-          <Command>
+          <Command shouldFilter={false}>
             <div className="flex items-center justify-between p-2 border-b">
               <CommandInput
                 placeholder="Search stocks..."

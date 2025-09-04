@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import StockTickerCombobox from "./StockTickerCombobox";
 import { useCreateHolding } from "@/hooks";
+import { StocksDebugger } from "./StocksDebugger";
 
 const addHoldingSchema = z.object({
   ticker: z.string().min(1, "Please select a stock"),

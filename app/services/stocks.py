@@ -80,11 +80,13 @@ class StockService:
     async def _fetch_popular_stocks(self) -> List[Dict[str, str]]:
         """Fetch popular stocks from Alpha Vantage API."""
         try:
-            if settings.ALPHA_VANTAGE_API_KEY:
-                # Try to fetch from Alpha Vantage
-                popular_stocks = await self._fetch_from_alpha_vantage()
-                if popular_stocks:
-                    return popular_stocks
+            # Temporarily skip Alpha Vantage to avoid timeouts
+            # if settings.ALPHA_VANTAGE_API_KEY:
+            #     # Try to fetch from Alpha Vantage
+            #     popular_stocks = await self._fetch_from_alpha_vantage()
+            #     if popular_stocks:
+            #         return popular_stocks
+            logger.info("Using static stocks list for better performance")
         except Exception as e:
             logger.warning(f"Alpha Vantage fetch failed: {e}")
 
