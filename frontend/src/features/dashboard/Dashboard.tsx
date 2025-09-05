@@ -10,16 +10,16 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
-import { Button } from "./ui/button";
-import { Alert, AlertDescription } from "./ui/alert";
-import { Badge } from "./ui/badge";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import {
   usePortfolioSummary,
   useHoldings,
   useAllocationData,
-} from "../hooks/useHoldings";
-import { useLatestInsights } from "../hooks/useInsights";
-import type { Holding } from "../types/generated";
+} from "@/hooks/useHoldings";
+import { useLatestInsights } from "@/hooks/useInsights";
+import type { Holding } from "@/types/generated";
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();

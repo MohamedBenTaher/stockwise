@@ -4,38 +4,24 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { useState } from "react";
-import { Dashboard } from "./components/Dashboard";
-import { Holdings } from "./components/Holdings";
-import { AddHoldingPage } from "./components/AddHoldingPage";
-import { Insights } from "./components/Insights";
-import { RiskAnalysis } from "./components/RiskAnalysis";
+import { Dashboard } from "@/features/dashboard";
+import { Holdings, AddHoldingPage } from "@/features/holdings";
+import { Insights } from "@/features/insights";
+import { RiskAnalysis } from "@/features/risk";
 import Charts from "./pages/Charts";
-import AuthForm from "./components/Auth_new";
-import { Layout } from "./components/Layout";
+import { AuthForm } from "@/features/auth";
+import { Layout } from "@/features/layout";
 import { Toaster } from "./components/ui/sonner";
-import { OnboardingFlow } from "./components/OnboardingFlow";
-import LandingPage from "./components/LandingPage";
+import { LandingPage } from "@/features/landing";
 import { useUser } from "./hooks/useAuth";
 import { Loader2 } from "lucide-react";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import "./App.css";
-import { News } from "./components/News";
+import { News } from "@/features/news";
 import ColorShowcase from "./components/ColorShowcase";
 
 function App() {
-  const { data: user, isLoading, error } = useUser();
-
-  // Check if user has completed onboarding (this would typically come from user profile or localStorage)
-  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
-    return localStorage.getItem("stockwise_onboarding_completed") === "true";
-  });
-
-  const handleOnboardingComplete = () => {
-    setHasCompletedOnboarding(true);
-    // Save to localStorage
-    localStorage.setItem("stockwise_onboarding_completed", "true");
-  };
+  const { data: user, isLoading } = useUser();
 
   if (isLoading) {
     return (

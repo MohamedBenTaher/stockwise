@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, ArrowLeft, Plus } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -13,17 +13,21 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import { Input } from "./ui/input";
-import { Calendar } from "./ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import StockTickerCombobox from "./StockTickerCombobox";
@@ -164,23 +168,25 @@ export const AddHoldingPage: React.FC = () => {
                       <FormLabel className="text-foreground">
                         Asset Type
                       </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
                           <SelectTrigger className="bg-white/5 backdrop-blur-sm border border-white/20 text-foreground">
                             <SelectValue placeholder="Select asset type" />
                           </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-background/95 backdrop-blur-sm border border-white/20">
-                          <SelectItem value="stock">Stock</SelectItem>
-                          <SelectItem value="etf">ETF</SelectItem>
-                          <SelectItem value="crypto">Cryptocurrency</SelectItem>
-                          <SelectItem value="bond">Bond</SelectItem>
-                          <SelectItem value="commodity">Commodity</SelectItem>
-                        </SelectContent>
-                      </Select>
+                          <SelectContent className="bg-background/95 backdrop-blur-sm border border-white/20">
+                            <SelectItem value="stock">Stock</SelectItem>
+                            <SelectItem value="etf">ETF</SelectItem>
+                            <SelectItem value="crypto">
+                              Cryptocurrency
+                            </SelectItem>
+                            <SelectItem value="bond">Bond</SelectItem>
+                            <SelectItem value="commodity">Commodity</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

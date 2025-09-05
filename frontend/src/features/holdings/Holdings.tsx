@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -21,8 +21,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -30,11 +35,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import { Input } from "./ui/input";
-import { Alert, AlertDescription } from "./ui/alert";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Calendar } from "./ui/calendar";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 
 import { useHoldings, useUpdateHolding, useDeleteHolding } from "@/hooks";
 import { toast } from "sonner";

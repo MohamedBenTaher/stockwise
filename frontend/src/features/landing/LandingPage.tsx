@@ -10,7 +10,7 @@ import { CTASection } from "@/components/landing/cta-section";
 import { FooterSection } from "@/components/landing/footer-section";
 import { AnimatedSection } from "@/components/landing/animated-section";
 
-export default function LandingPage() {
+export function LandingPage() {
   console.log("LandingPage: Component is rendering");
 
   return (

@@ -1,10 +1,10 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import { useUser } from "../hooks/useAuth";
+import { useUser } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
-import { SidebarInset, SidebarProvider } from "./ui/sidebar";
-import { AppSidebar } from "./app-sidebar";
-import { SiteHeader } from "./site-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "./AppSidebar";
+import { SiteHeader } from "./SiteHeader";
 
 export const Layout: React.FC = () => {
   const { data: user, isLoading } = useUser();

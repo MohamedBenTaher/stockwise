@@ -14,24 +14,24 @@ import {
   Loader2,
   BarChart3,
 } from "lucide-react";
-import { Card, CardContent } from "./ui/card";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
-import { Input } from "./ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+} from "@/components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   useNews,
   useMarketSentiment,
@@ -41,10 +41,10 @@ import {
   useBookmarkedNews,
   useRefreshNews,
   type NewsFilters,
-} from "../hooks/useNews";
+} from "@/hooks/useNews";
 import { BookmarkButton } from "./BookmarkButton";
 import { BookmarkFloater } from "./BookmarkFloater";
-import { ToastProvider } from "./Toast";
+import { ToastProvider } from "@/components/Toast";
 import { cn } from "@/lib/utils";
 
 export const News: React.FC = () => {

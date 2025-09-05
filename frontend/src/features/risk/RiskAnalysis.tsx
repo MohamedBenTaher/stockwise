@@ -13,13 +13,13 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "./ui/card";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
-import { Alert, AlertDescription } from "./ui/alert";
-import { Progress } from "./ui/progress";
-import { useRiskAnalysis, useRiskMetrics } from "../hooks/useInsights";
-import { usePortfolioSummary } from "../hooks/useHoldings";
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Progress } from "@/components/ui/progress";
+import { useRiskAnalysis, useRiskMetrics } from "@/hooks/useInsights";
+import { usePortfolioSummary } from "@/hooks/useHoldings";
 
 export const RiskAnalysis: React.FC = () => {
   const {

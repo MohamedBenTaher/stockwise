@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Bookmark, BookmarkCheck } from "lucide-react";
-import { Button } from "./ui/button";
-import { useBookmarkNews } from "../hooks/useNews";
-import { useToast } from "./Toast";
+import { Button } from "@/components/ui/button";
+import { useBookmarkNews } from "@/hooks/useNews";
+import { useToast } from "@/components/Toast";
 import { cn } from "@/lib/utils";
 
 interface BookmarkButtonProps {

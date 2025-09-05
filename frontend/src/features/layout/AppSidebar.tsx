@@ -21,10 +21,10 @@ import {
   NewspaperIcon as IconNewspaper,
 } from "lucide-react";
 
-import { NavDocuments } from "@/features/nav";
-import { NavMain } from "@/features/nav";
-import { NavSecondary } from "@/features/nav";
-import { NavUser } from "@/features/nav";
+import { NavDocuments } from "@/features/nav/NavDocuments";
+import { NavMain } from "@/features/nav/NavMain";
+import { NavSecondary } from "@/features/nav/NavSecondary";
+import { NavUser } from "@/features/nav/NavUser";
 import {
   Sidebar,
   SidebarContent,
