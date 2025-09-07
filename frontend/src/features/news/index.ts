@@ -1,3 +1,3 @@
-export { News } from "./News";
-export { BookmarkButton } from "./BookmarkButton";
-export { BookmarkFloater } from "./BookmarkFloater";
+export * from "./News";
+export * from "./BookmarkButton";
+export * from "./BookmarkFloater";

@@ -450,13 +450,20 @@ export const News: React.FC = () => {
                         >
                           <CardContent className="p-6">
                             <div className="flex items-start space-x-4">
-                              {article.image_url && (
-                                <img
-                                  src={article.image_url || ""}
-                                  alt=""
-                                  className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
-                                />
-                              )}
+                              <img
+                                src={
+                                  article.image_url &&
+                                  article.image_url.trim().length > 0
+                                    ? article.image_url
+                                    : "/placeholder/article.png"
+                                }
+                                alt=""
+                                className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = "/placeholder/article.png";
+                                }}
+                              />
 
                               <div className="flex-1 space-y-3">
                                 {/* Article Header */}

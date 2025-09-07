@@ -1,104 +1,50 @@
-import React, { useState } from "react";
-import { Bookmark, BookmarkCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useBookmarkNews } from "@/hooks/useNews";
-import { useToast } from "@/components/Toast";
-import { cn } from "@/lib/utils";
+"use client"
+
+import type React from "react"
+import { useState } from "react"
+import { Bookmark } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 interface BookmarkButtonProps {
-  articleId: string;
-  isBookmarked: boolean;
-  className?: string;
-  size?: "sm" | "default" | "lg";
-  variant?: "ghost" | "outline" | "default";
-  showText?: boolean;
+  articleId: string
+  isBookmarked: boolean
+  size?: "sm" | "md" | "lg"
+  variant?: "ghost" | "outline" | "default"
+  className?: string
 }
 
 export const BookmarkButton: React.FC<BookmarkButtonProps> = ({
   articleId,
-  isBookmarked,
-  className,
-  size = "sm",
+  isBookmarked: initialBookmarked,
+  size = "md",
   variant = "ghost",
-  showText = false,
+  className,
 }) => {
-  const [isOptimistic, setIsOptimistic] = useState(isBookmarked);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const bookmarkMutation = useBookmarkNews();
-  const { showToast } = useToast();
+  const [isBookmarked, setIsBookmarked] = useState(initialBookmarked)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleToggle = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleToggleBookmark = async () => {
+    setIsLoading(true)
 
-    // Start animation
-    setIsAnimating(true);
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 300))
 
-    // Optimistic update
-    const newBookmarkedState = !isOptimistic;
-    setIsOptimistic(newBookmarkedState);
+    setIsBookmarked(!isBookmarked)
+    setIsLoading(false)
 
-    try {
-      await bookmarkMutation.mutateAsync({
-        articleId,
-        bookmarked: !isBookmarked,
-      });
-
-      // Show success toast
-      showToast(
-        newBookmarkedState ? "Article bookmarked!" : "Bookmark removed",
-        "success"
-      );
-
-      // Stop animation after delay
-      setTimeout(() => setIsAnimating(false), 600);
-    } catch (error) {
-      // Revert optimistic update on error
-      setIsOptimistic(isBookmarked);
-      setIsAnimating(false);
-      showToast("Failed to update bookmark", "error");
-      console.error("Failed to toggle bookmark:", error);
-    }
-  };
-
-  const Icon = isOptimistic ? BookmarkCheck : Bookmark;
-  const iconClassName = cn(
-    "transition-all duration-300",
-    size === "sm" && "h-4 w-4",
-    size === "default" && "h-5 w-5",
-    size === "lg" && "h-6 w-6",
-    isOptimistic
-      ? "fill-yellow-400 text-yellow-600 scale-110"
-      : "text-muted-foreground hover:text-yellow-600 hover:scale-105",
-    isAnimating && "animate-pulse scale-125"
-  );
+    console.log(`${isBookmarked ? "Removed" : "Added"} bookmark for article: ${articleId}`)
+  }
 
   return (
     <Button
       variant={variant}
       size={size}
-      onClick={handleToggle}
-      disabled={bookmarkMutation.isPending}
-      className={cn(
-        "transition-all duration-300 hover:scale-105",
-        isOptimistic && "text-yellow-600 bg-yellow-50/10 dark:bg-yellow-900/20",
-        bookmarkMutation.isPending && "opacity-50",
-        isAnimating && "scale-110",
-        className
-      )}
-      title={isOptimistic ? "Remove bookmark" : "Bookmark article"}
+      onClick={handleToggleBookmark}
+      disabled={isLoading}
+      className={cn("transition-colors", isBookmarked && "text-blue-600 hover:text-blue-700", className)}
     >
-      <Icon className={iconClassName} />
-      {showText && (
-        <span className="ml-2 transition-colors duration-200">
-          {isOptimistic ? "Bookmarked" : "Bookmark"}
-        </span>
-      )}
-
-      {/* Show small success indicator when bookmarked */}
-      {isOptimistic && (
-        <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
-      )}
+      <Bookmark className={cn("h-4 w-4", isBookmarked && "fill-current")} />
     </Button>
-  );
-};
+  )
+}
