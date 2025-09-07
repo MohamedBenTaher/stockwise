@@ -8,7 +8,7 @@ import { Dashboard } from "@/features/dashboard";
 import { Holdings, AddHoldingPage } from "@/features/holdings";
 import { Insights } from "@/features/insights";
 import { RiskAnalysis } from "@/features/risk";
-import Charts from "./pages/Charts";
+import Charts from "./features/charts/Charts";
 import { AuthForm } from "@/features/auth";
 import { Layout } from "@/features/layout";
 import { Toaster } from "./components/ui/sonner";

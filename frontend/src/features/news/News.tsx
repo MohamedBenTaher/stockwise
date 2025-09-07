@@ -452,8 +452,8 @@ export const News: React.FC = () => {
                             <div className="flex items-start space-x-4">
                               {article.image_url && (
                                 <img
-                                  src={article.image_url}
-                                  alt={article.title}
+                                  src={article.image_url || ""}
+                                  alt=""
                                   className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
                                 />
                               )}
