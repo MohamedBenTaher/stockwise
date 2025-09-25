@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { riskApi } from "../services/api";
+import { typedApi } from "../api/typed-api";
 
 export const useRiskAnalysis = () => {
   return useQuery({
     queryKey: ["risk", "analysis"],
-    queryFn: riskApi.getRiskAnalysis,
+    queryFn: typedApi.risk.getAnalysis,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
@@ -12,7 +12,7 @@ export const useRiskAnalysis = () => {
 export const useRiskHeatmap = () => {
   return useQuery({
     queryKey: ["risk", "heatmap"],
-    queryFn: riskApi.getRiskHeatmap,
+    queryFn: typedApi.risk.getHeatmap,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
@@ -20,7 +20,7 @@ export const useRiskHeatmap = () => {
 export const useRiskMetrics = () => {
   return useQuery({
     queryKey: ["risk", "metrics"],
-    queryFn: riskApi.getRiskMetrics,
+    queryFn: typedApi.risk.getMetrics,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };

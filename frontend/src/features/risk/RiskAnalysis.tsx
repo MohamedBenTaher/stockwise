@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { useRiskAnalysis, useRiskMetrics } from "@/hooks/useInsights";
+import { useRiskHeatmap } from "@/hooks/useRisk";
 import { usePortfolioSummary } from "@/hooks/useHoldings";
 
 export const RiskAnalysis: React.FC = () => {
@@ -35,12 +36,22 @@ export const RiskAnalysis: React.FC = () => {
     error: riskMetricsError,
   } = useRiskMetrics();
 
+  const {
+    data: riskHeatmap,
+    isLoading: riskHeatmapLoading,
+    error: riskHeatmapError,
+  } = useRiskHeatmap();
+
   const { data: portfolioSummary, isLoading: portfolioLoading } =
     usePortfolioSummary();
 
   const hasHoldings = portfolioSummary && portfolioSummary.holdings_count > 0;
-  const loading = riskAnalysisLoading || riskMetricsLoading || portfolioLoading;
-  const error = riskAnalysisError || riskMetricsError;
+  const loading =
+    riskAnalysisLoading ||
+    riskMetricsLoading ||
+    riskHeatmapLoading ||
+    portfolioLoading;
+  const error = riskAnalysisError || riskMetricsError || riskHeatmapError;
 
   const getRiskColor = (level: string) => {
     switch (level?.toLowerCase()) {
@@ -259,27 +270,50 @@ export const RiskAnalysis: React.FC = () => {
     );
   }
 
+  // Merge analysis + metrics + heatmap so UI has all expected fields.
+  const mergedData = {
+    ...(riskAnalysis || {}),
+    ...(riskMetrics || {}),
+  } as any;
+
+  // If metrics contains nested 'risk_metrics', flatten them to top-level so
+  // the UI can read portfolio_volatility, value_at_risk_5pct, etc.
+  if (riskMetrics && (riskMetrics as any).risk_metrics) {
+    const nested = (riskMetrics as any).risk_metrics;
+    Object.assign(mergedData, nested);
+  }
+
+  // Prefer heatmap sectors/countries when available
+  if (riskHeatmap && Array.isArray(riskHeatmap.sectors)) {
+    mergedData.sectors = riskHeatmap.sectors;
+  }
+  if (riskHeatmap && Array.isArray(riskHeatmap.countries)) {
+    mergedData.countries = riskHeatmap.countries;
+  }
+
   // Use real data if available, fallback to placeholder if needed
-  const riskData = riskAnalysis || {
-    overall_risk_score: 65,
-    risk_level: "medium",
-    herfindahl_index: 0.45,
-    effective_number_of_holdings: 2.2,
-    max_position_weight: 0.35,
-    portfolio_volatility: 0.18,
-    value_at_risk_5pct: 8500,
-    sectors: [
-      { name: "Technology", percentage: 60, risk_level: "high" },
-      { name: "Healthcare", percentage: 20, risk_level: "medium" },
-      { name: "Financial", percentage: 15, risk_level: "medium" },
-      { name: "Consumer", percentage: 5, risk_level: "low" },
-    ],
-    countries: [
-      { name: "United States", percentage: 85, risk_level: "medium" },
-      { name: "Europe", percentage: 10, risk_level: "low" },
-      { name: "Asia Pacific", percentage: 5, risk_level: "low" },
-    ],
-  };
+  const riskData = Object.keys(mergedData).length
+    ? mergedData
+    : {
+        overall_risk_score: 65,
+        risk_level: "medium",
+        herfindahl_index: 0.45,
+        effective_number_of_holdings: 2.2,
+        max_position_weight: 0.35,
+        portfolio_volatility: 0.18,
+        value_at_risk_5pct: 8500,
+        sectors: [
+          { name: "Technology", percentage: 60, risk_level: "high" },
+          { name: "Healthcare", percentage: 20, risk_level: "medium" },
+          { name: "Financial", percentage: 15, risk_level: "medium" },
+          { name: "Consumer", percentage: 5, risk_level: "low" },
+        ],
+        countries: [
+          { name: "United States", percentage: 85, risk_level: "medium" },
+          { name: "Europe", percentage: 10, risk_level: "low" },
+          { name: "Asia Pacific", percentage: 5, risk_level: "low" },
+        ],
+      };
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -473,7 +507,7 @@ export const RiskAnalysis: React.FC = () => {
                         </Badge>
                       </div>
                       <span className="font-bold text-lg text-foreground">
-                        {sector.percentage}%
+                        {sector.percentage.toFixed(1)}%
                       </span>
                     </div>
                     <div className="relative w-full bg-white/10 backdrop-blur-sm rounded-full h-3 overflow-hidden">
@@ -523,7 +557,7 @@ export const RiskAnalysis: React.FC = () => {
                         </Badge>
                       </div>
                       <span className="font-bold text-lg text-foreground">
-                        {country.percentage}%
+                        {country.percentage.toFixed(1)}%
                       </span>
                     </div>
                     <div className="relative w-full bg-white/10 backdrop-blur-sm rounded-full h-3 overflow-hidden">

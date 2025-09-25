@@ -18,6 +18,10 @@ export const useGenerateInsights = () => {
     mutationFn: (analysisType: string = "full") =>
       typedApi.insights.generate(analysisType),
     onSuccess: () => {
+      // Invalidate the exact 'latest' insights key so UI components
+      // using ['insights', 'latest'] will refetch immediately.
+      queryClient.invalidateQueries({ queryKey: ["insights", "latest"] });
+      // Also invalidate any broader insights keys as a fallback.
       queryClient.invalidateQueries({ queryKey: ["insights"] });
     },
   });

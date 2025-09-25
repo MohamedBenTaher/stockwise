@@ -26,10 +26,33 @@ app = FastAPI(
     openapi_url="/openapi.json",
 )
 
+
+# Debug middleware: log cookies/headers for risk endpoints to help diagnose
+# cases where auth cookies are not sent and requests return 401.
+@app.middleware("http")
+async def log_risk_requests(request, call_next):
+    try:
+        path = request.url.path or ""
+        if path.startswith(f"{settings.API_V1_STR}/risk"):
+            # Log basic request info for debugging
+            logger_.info(
+                "[DEBUG] Incoming risk request: %s %s" % (request.method, path)
+            )
+            logger_.info("[DEBUG] Cookies: %s" % (dict(request.cookies),))
+            # Optionally log origin header
+            origin = request.headers.get("origin")
+            logger_.info(f"[DEBUG] Origin: {origin}")
+    except Exception as e:
+        logger_.warning(f"[DEBUG] Failed to log risk request details: {e}")
+
+    response = await call_next(request)
+    return response
+
+
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify actual origins
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -44,7 +67,7 @@ async def startup_event():
         # Check if cache is already populated (don't block startup)
         cached_prices = await bulk_price_service.get_cached_prices()
         if cached_prices:
-            logger_.info(f"✅ Found {len(cached_prices)} cached prices, API ready")
+            logger_.info("✅ Found %d cached prices, API ready" % (len(cached_prices),))
         else:
             logger_.info("📊 No cached prices found, triggering background fetch...")
             # Non-blocking background trigger
@@ -62,21 +85,41 @@ async def startup_event():
 
 
 # Include routers
-app.include_router(auth_router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(
-    holdings_router, prefix=f"{settings.API_V1_STR}/holdings", tags=["holdings"]
+    auth_router,
+    prefix=f"{settings.API_V1_STR}/auth",
+    tags=["auth"],
 )
 app.include_router(
-    insights_router, prefix=f"{settings.API_V1_STR}/insights", tags=["insights"]
-)
-app.include_router(risk_router, prefix=f"{settings.API_V1_STR}/risk", tags=["risk"])
-app.include_router(
-    stocks_router, prefix=f"{settings.API_V1_STR}/stocks", tags=["stocks"]
+    holdings_router,
+    prefix=f"{settings.API_V1_STR}/holdings",
+    tags=["holdings"],
 )
 app.include_router(
-    charts_router, prefix=f"{settings.API_V1_STR}/charts", tags=["charts"]
+    insights_router,
+    prefix=f"{settings.API_V1_STR}/insights",
+    tags=["insights"],
 )
-app.include_router(news_router, prefix=f"{settings.API_V1_STR}/news", tags=["news"])
+app.include_router(
+    risk_router,
+    prefix=f"{settings.API_V1_STR}/risk",
+    tags=["risk"],
+)
+app.include_router(
+    stocks_router,
+    prefix=f"{settings.API_V1_STR}/stocks",
+    tags=["stocks"],
+)
+app.include_router(
+    charts_router,
+    prefix=f"{settings.API_V1_STR}/charts",
+    tags=["charts"],
+)
+app.include_router(
+    news_router,
+    prefix=f"{settings.API_V1_STR}/news",
+    tags=["news"],
+)
 
 
 @app.get("/")
@@ -125,7 +168,9 @@ async def catch_all(request: Request):
     if request.path_params["full_path"].startswith(".auth/"):
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"detail": "This endpoint should be handled by Azure Easy Auth"},
+            content={
+                "detail": "This endpoint should be handled by Azure Easy Auth",
+            },
         )
 
     ui_directory_path = Path(settings.UI_DIRECTORY).resolve()

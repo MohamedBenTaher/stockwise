@@ -1,7 +1,6 @@
 from typing import Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.holdings import HoldingService
-import numpy as np
 
 
 class RiskService:

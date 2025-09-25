@@ -389,7 +389,7 @@ const RealtimeCodingPreviews: React.FC = () => {
 
       {/* Sync Indicator at connection point */}
 
-      <style jsx>{`
+      <style>{`
         @keyframes pulse {
           0%,
           100% {

@@ -94,6 +94,22 @@ class AuthService:
         )
         return encoded_jwt
 
+    def create_refresh_token(
+        self, data: dict, expires_delta: Optional[timedelta] = None
+    ):
+        """Create a JWT refresh token with a longer expiry."""
+        to_encode = data.copy()
+        if expires_delta:
+            expire = datetime.utcnow() + expires_delta
+        else:
+            # Default refresh token expiry: 7 days
+            expire = datetime.utcnow() + timedelta(days=7)
+        to_encode.update({"exp": expire})
+        encoded_jwt = jwt.encode(
+            to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+        )
+        return encoded_jwt
+
 
 async def get_current_user(
     request: Request, db: AsyncSession = Depends(get_db)

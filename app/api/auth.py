@@ -1,5 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+    Response,
+    Request,
+)
+from fastapi.security import OAuth2PasswordRequestForm
+from jose import JWTError, jwt
+from app.config import settings
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import get_db
 from app.schemas.user import User, UserCreate, Token
@@ -17,7 +26,8 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     existing_user = await auth_service.get_user_by_email(user.email)
     if existing_user:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered",
         )
 
     return await auth_service.create_user(user)
@@ -53,6 +63,18 @@ async def login(
         secure=False,  # Set to True in production with HTTPS
     )
 
+    # Also set a refresh token cookie with longer expiry
+    refresh_token = auth_service.create_refresh_token(data={"sub": user.email})
+    response.set_cookie(
+        key="refresh_token",
+        value=f"Bearer {refresh_token}",
+        httponly=True,
+        max_age=60 * 60 * 24 * 7,  # 7 days
+        expires=60 * 60 * 24 * 7,
+        samesite="lax",
+        secure=False,
+    )
+
     return {"access_token": access_token, "token_type": "bearer"}
 
 
@@ -65,22 +87,46 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
 @router.post("/refresh", response_model=Token)
 async def refresh_token(
     response: Response,
-    current_user: User = Depends(get_current_user),
+    request: Request,
     db: AsyncSession = Depends(get_db),
 ):
-    """Refresh access token."""
+    """Refresh access token using refresh token cookie."""
     auth_service = AuthService(db)
-    access_token = auth_service.create_access_token(data={"sub": current_user.email})
 
-    # Update cookie with new token
+    # Read refresh token from cookie
+    token = request.cookies.get("refresh_token")
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="No refresh token"
+        )
+
+    if token.startswith("Bearer "):
+        token = token[7:]
+
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token"
+            )
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token"
+        )
+
+    # Issue new access token
+    access_token = auth_service.create_access_token(data={"sub": username})
     response.set_cookie(
         key="access_token",
         value=f"Bearer {access_token}",
         httponly=True,
-        max_age=1800,  # 30 minutes
+        max_age=1800,
         expires=1800,
         samesite="lax",
-        secure=False,  # Set to True in production with HTTPS
+        secure=False,
     )
 
     return {"access_token": access_token, "token_type": "bearer"}
